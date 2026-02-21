@@ -1,0 +1,800 @@
+trace id 07c9c091 inet trace prerouting packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32803 ip protocol tcp ip length 40 tcp sport 29670 tcp dport 22 tcp flags == ack tcp window 8209 
+trace id 07c9c091 inet trace prerouting rule ip protocol tcp meta nftrace set 1 (verdict continue)
+trace id 07c9c091 inet trace prerouting verdict continue 
+trace id 07c9c091 inet trace prerouting policy accept 
+trace id 07c9c091 ip vyos_conntrack PREROUTING packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32803 ip length 40 tcp sport 29670 tcp dport 22 tcp flags == ack tcp window 8209 
+trace id 07c9c091 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump VYOS_CT_IGNORE (verdict jump VYOS_CT_IGNORE)
+trace id 07c9c091 ip vyos_conntrack VYOS_CT_IGNORE verdict return 
+trace id 07c9c091 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump FW_CONNTRACK (verdict jump FW_CONNTRACK)
+trace id 07c9c091 ip vyos_conntrack FW_CONNTRACK verdict return 
+trace id 07c9c091 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump NAT_CONNTRACK (verdict jump NAT_CONNTRACK)
+trace id 07c9c091 ip vyos_conntrack NAT_CONNTRACK rule accept (verdict accept)
+trace id 07c9c091 ip vyos_filter VYOS_PREROUTING_raw packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32803 ip length 40 tcp sport 29670 tcp dport 22 tcp flags == ack tcp window 8209 
+trace id 07c9c091 ip vyos_filter VYOS_PREROUTING_raw rule counter packets 1744 bytes 158911 accept comment "PRE-raw default-action accept" (verdict accept)
+trace id 07c9c091 inet vrf_zones vrf_zones_ct_in packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32803 ip protocol tcp ip length 40 tcp sport 29670 tcp dport 22 tcp flags == ack tcp window 8209 
+trace id 07c9c091 inet vrf_zones vrf_zones_ct_in verdict continue 
+trace id 07c9c091 inet vrf_zones vrf_zones_ct_in policy accept 
+trace id 07c9c091 ip raw VYOS_PREROUTING_HOOK packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32803 ip length 40 tcp sport 29670 tcp dport 22 tcp flags == ack tcp window 8209 
+trace id 07c9c091 ip raw VYOS_PREROUTING_HOOK verdict continue 
+trace id 07c9c091 ip raw VYOS_PREROUTING_HOOK policy accept 
+trace id 07c9c091 ip raw vyos_rpfilter packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32803 ip length 40 tcp sport 29670 tcp dport 22 tcp flags == ack tcp window 8209 
+trace id 07c9c091 ip raw vyos_rpfilter rule counter packets 2151 bytes 191831 jump vyos_global_rpfilter (verdict jump vyos_global_rpfilter)
+trace id 07c9c091 ip raw vyos_global_rpfilter verdict return 
+trace id 07c9c091 ip raw vyos_rpfilter verdict continue 
+trace id 07c9c091 ip raw vyos_rpfilter policy accept 
+trace id 07c9c091 ip vyos_conntrack PREROUTING_HELPER packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32803 ip length 40 tcp sport 29670 tcp dport 22 tcp flags == ack tcp window 8209 
+trace id 07c9c091 ip vyos_conntrack PREROUTING_HELPER rule counter packets 1744 bytes 158911 jump VYOS_CT_HELPER (verdict jump VYOS_CT_HELPER)
+trace id 07c9c091 ip vyos_conntrack VYOS_CT_HELPER verdict return 
+trace id 07c9c091 ip vyos_conntrack PREROUTING_HELPER verdict continue 
+trace id 07c9c091 ip vyos_conntrack PREROUTING_HELPER policy accept 
+trace id 07c9c091 ip vyos_filter VYOS_INPUT_filter packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32803 ip length 40 tcp sport 29670 tcp dport 22 tcp flags == ack tcp window 8209 
+trace id 07c9c091 ip vyos_filter VYOS_INPUT_filter rule counter packets 1572 bytes 143239 accept comment "INP-filter default-action accept" (verdict accept)
+trace id 89f3ae4f inet trace prerouting packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32804 ip protocol tcp ip length 104 tcp sport 29710 tcp dport 22 tcp flags == 0x18 tcp window 8210 
+trace id 89f3ae4f inet trace prerouting rule ip protocol tcp meta nftrace set 1 (verdict continue)
+trace id 89f3ae4f inet trace prerouting verdict continue 
+trace id 89f3ae4f inet trace prerouting policy accept 
+trace id 89f3ae4f ip vyos_conntrack PREROUTING packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32804 ip length 104 tcp sport 29710 tcp dport 22 tcp flags == 0x18 tcp window 8210 
+trace id 89f3ae4f ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump VYOS_CT_IGNORE (verdict jump VYOS_CT_IGNORE)
+trace id 89f3ae4f ip vyos_conntrack VYOS_CT_IGNORE verdict return 
+trace id 89f3ae4f ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump FW_CONNTRACK (verdict jump FW_CONNTRACK)
+trace id 89f3ae4f ip vyos_conntrack FW_CONNTRACK verdict return 
+trace id 89f3ae4f ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump NAT_CONNTRACK (verdict jump NAT_CONNTRACK)
+trace id 89f3ae4f ip vyos_conntrack NAT_CONNTRACK rule accept (verdict accept)
+trace id 89f3ae4f ip vyos_filter VYOS_PREROUTING_raw packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32804 ip length 104 tcp sport 29710 tcp dport 22 tcp flags == 0x18 tcp window 8210 
+trace id 89f3ae4f ip vyos_filter VYOS_PREROUTING_raw rule counter packets 1744 bytes 158911 accept comment "PRE-raw default-action accept" (verdict accept)
+trace id 89f3ae4f inet vrf_zones vrf_zones_ct_in packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32804 ip protocol tcp ip length 104 tcp sport 29710 tcp dport 22 tcp flags == 0x18 tcp window 8210 
+trace id 89f3ae4f inet vrf_zones vrf_zones_ct_in verdict continue 
+trace id 89f3ae4f inet vrf_zones vrf_zones_ct_in policy accept 
+trace id 89f3ae4f ip raw VYOS_PREROUTING_HOOK packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32804 ip length 104 tcp sport 29710 tcp dport 22 tcp flags == 0x18 tcp window 8210 
+trace id 89f3ae4f ip raw VYOS_PREROUTING_HOOK verdict continue 
+trace id 89f3ae4f ip raw VYOS_PREROUTING_HOOK policy accept 
+trace id 89f3ae4f ip raw vyos_rpfilter packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32804 ip length 104 tcp sport 29710 tcp dport 22 tcp flags == 0x18 tcp window 8210 
+trace id 89f3ae4f ip raw vyos_rpfilter rule counter packets 2151 bytes 191831 jump vyos_global_rpfilter (verdict jump vyos_global_rpfilter)
+trace id 89f3ae4f ip raw vyos_global_rpfilter verdict return 
+trace id 89f3ae4f ip raw vyos_rpfilter verdict continue 
+trace id 89f3ae4f ip raw vyos_rpfilter policy accept 
+trace id 89f3ae4f ip vyos_conntrack PREROUTING_HELPER packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32804 ip length 104 tcp sport 29710 tcp dport 22 tcp flags == 0x18 tcp window 8210 
+trace id 89f3ae4f ip vyos_conntrack PREROUTING_HELPER rule counter packets 1744 bytes 158911 jump VYOS_CT_HELPER (verdict jump VYOS_CT_HELPER)
+trace id 89f3ae4f ip vyos_conntrack VYOS_CT_HELPER verdict return 
+trace id 89f3ae4f ip vyos_conntrack PREROUTING_HELPER verdict continue 
+trace id 89f3ae4f ip vyos_conntrack PREROUTING_HELPER policy accept 
+trace id 89f3ae4f ip vyos_filter VYOS_INPUT_filter packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32804 ip length 104 tcp sport 29710 tcp dport 22 tcp flags == 0x18 tcp window 8210 
+trace id 89f3ae4f ip vyos_filter VYOS_INPUT_filter rule counter packets 1572 bytes 143239 accept comment "INP-filter default-action accept" (verdict accept)
+trace id 89f3ae4f inet trace prerouting packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32805 ip protocol tcp ip length 40 tcp sport 29710 tcp dport 22 tcp flags == ack tcp window 8209 
+trace id 89f3ae4f inet trace prerouting rule ip protocol tcp meta nftrace set 1 (verdict continue)
+trace id 89f3ae4f inet trace prerouting verdict continue 
+trace id 89f3ae4f inet trace prerouting policy accept 
+trace id 89f3ae4f ip vyos_conntrack PREROUTING packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32805 ip length 40 tcp sport 29710 tcp dport 22 tcp flags == ack tcp window 8209 
+trace id 89f3ae4f ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump VYOS_CT_IGNORE (verdict jump VYOS_CT_IGNORE)
+trace id 89f3ae4f ip vyos_conntrack VYOS_CT_IGNORE verdict return 
+trace id 89f3ae4f ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump FW_CONNTRACK (verdict jump FW_CONNTRACK)
+trace id 89f3ae4f ip vyos_conntrack FW_CONNTRACK verdict return 
+trace id 89f3ae4f ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump NAT_CONNTRACK (verdict jump NAT_CONNTRACK)
+trace id 89f3ae4f ip vyos_conntrack NAT_CONNTRACK rule accept (verdict accept)
+trace id 89f3ae4f ip vyos_filter VYOS_PREROUTING_raw packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32805 ip length 40 tcp sport 29710 tcp dport 22 tcp flags == ack tcp window 8209 
+trace id 89f3ae4f ip vyos_filter VYOS_PREROUTING_raw rule counter packets 1744 bytes 158911 accept comment "PRE-raw default-action accept" (verdict accept)
+trace id 89f3ae4f inet vrf_zones vrf_zones_ct_in packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32805 ip protocol tcp ip length 40 tcp sport 29710 tcp dport 22 tcp flags == ack tcp window 8209 
+trace id 89f3ae4f inet vrf_zones vrf_zones_ct_in verdict continue 
+trace id 89f3ae4f inet vrf_zones vrf_zones_ct_in policy accept 
+trace id 89f3ae4f ip raw VYOS_PREROUTING_HOOK packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32805 ip length 40 tcp sport 29710 tcp dport 22 tcp flags == ack tcp window 8209 
+trace id 89f3ae4f ip raw VYOS_PREROUTING_HOOK verdict continue 
+trace id 89f3ae4f ip raw VYOS_PREROUTING_HOOK policy accept 
+trace id 89f3ae4f ip raw vyos_rpfilter packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32805 ip length 40 tcp sport 29710 tcp dport 22 tcp flags == ack tcp window 8209 
+trace id 89f3ae4f ip raw vyos_rpfilter rule counter packets 2151 bytes 191831 jump vyos_global_rpfilter (verdict jump vyos_global_rpfilter)
+trace id 89f3ae4f ip raw vyos_global_rpfilter verdict return 
+trace id 89f3ae4f ip raw vyos_rpfilter verdict continue 
+trace id 89f3ae4f ip raw vyos_rpfilter policy accept 
+trace id 89f3ae4f ip vyos_conntrack PREROUTING_HELPER packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32805 ip length 40 tcp sport 29710 tcp dport 22 tcp flags == ack tcp window 8209 
+trace id 89f3ae4f ip vyos_conntrack PREROUTING_HELPER rule counter packets 1744 bytes 158911 jump VYOS_CT_HELPER (verdict jump VYOS_CT_HELPER)
+trace id 89f3ae4f ip vyos_conntrack VYOS_CT_HELPER verdict return 
+trace id 89f3ae4f ip vyos_conntrack PREROUTING_HELPER verdict continue 
+trace id 89f3ae4f ip vyos_conntrack PREROUTING_HELPER policy accept 
+trace id 89f3ae4f ip vyos_filter VYOS_INPUT_filter packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32805 ip length 40 tcp sport 29710 tcp dport 22 tcp flags == ack tcp window 8209 
+trace id 89f3ae4f ip vyos_filter VYOS_INPUT_filter rule counter packets 1572 bytes 143239 accept comment "INP-filter default-action accept" (verdict accept)
+trace id 806b48dc inet trace prerouting packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32806 ip protocol tcp ip length 104 tcp sport 29710 tcp dport 22 tcp flags == 0x18 tcp window 8209 
+trace id 806b48dc inet trace prerouting rule ip protocol tcp meta nftrace set 1 (verdict continue)
+trace id 806b48dc inet trace prerouting verdict continue 
+trace id 806b48dc inet trace prerouting policy accept 
+trace id 806b48dc ip vyos_conntrack PREROUTING packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32806 ip length 104 tcp sport 29710 tcp dport 22 tcp flags == 0x18 tcp window 8209 
+trace id 806b48dc ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump VYOS_CT_IGNORE (verdict jump VYOS_CT_IGNORE)
+trace id 806b48dc ip vyos_conntrack VYOS_CT_IGNORE verdict return 
+trace id 806b48dc ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump FW_CONNTRACK (verdict jump FW_CONNTRACK)
+trace id 806b48dc ip vyos_conntrack FW_CONNTRACK verdict return 
+trace id 806b48dc ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump NAT_CONNTRACK (verdict jump NAT_CONNTRACK)
+trace id 806b48dc ip vyos_conntrack NAT_CONNTRACK rule accept (verdict accept)
+trace id 806b48dc ip vyos_filter VYOS_PREROUTING_raw packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32806 ip length 104 tcp sport 29710 tcp dport 22 tcp flags == 0x18 tcp window 8209 
+trace id 806b48dc ip vyos_filter VYOS_PREROUTING_raw rule counter packets 1744 bytes 158911 accept comment "PRE-raw default-action accept" (verdict accept)
+trace id 806b48dc inet vrf_zones vrf_zones_ct_in packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32806 ip protocol tcp ip length 104 tcp sport 29710 tcp dport 22 tcp flags == 0x18 tcp window 8209 
+trace id 806b48dc inet vrf_zones vrf_zones_ct_in verdict continue 
+trace id 806b48dc inet vrf_zones vrf_zones_ct_in policy accept 
+trace id 806b48dc ip raw VYOS_PREROUTING_HOOK packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32806 ip length 104 tcp sport 29710 tcp dport 22 tcp flags == 0x18 tcp window 8209 
+trace id 806b48dc ip raw VYOS_PREROUTING_HOOK verdict continue 
+trace id 806b48dc ip raw VYOS_PREROUTING_HOOK policy accept 
+trace id 806b48dc ip raw vyos_rpfilter packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32806 ip length 104 tcp sport 29710 tcp dport 22 tcp flags == 0x18 tcp window 8209 
+trace id 806b48dc ip raw vyos_rpfilter rule counter packets 2151 bytes 191831 jump vyos_global_rpfilter (verdict jump vyos_global_rpfilter)
+trace id 806b48dc ip raw vyos_global_rpfilter verdict return 
+trace id 806b48dc ip raw vyos_rpfilter verdict continue 
+trace id 806b48dc ip raw vyos_rpfilter policy accept 
+trace id 806b48dc ip vyos_conntrack PREROUTING_HELPER packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32806 ip length 104 tcp sport 29710 tcp dport 22 tcp flags == 0x18 tcp window 8209 
+trace id 806b48dc ip vyos_conntrack PREROUTING_HELPER rule counter packets 1744 bytes 158911 jump VYOS_CT_HELPER (verdict jump VYOS_CT_HELPER)
+trace id 806b48dc ip vyos_conntrack VYOS_CT_HELPER verdict return 
+trace id 806b48dc ip vyos_conntrack PREROUTING_HELPER verdict continue 
+trace id 806b48dc ip vyos_conntrack PREROUTING_HELPER policy accept 
+trace id 806b48dc ip vyos_filter VYOS_INPUT_filter packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32806 ip length 104 tcp sport 29710 tcp dport 22 tcp flags == 0x18 tcp window 8209 
+trace id 806b48dc ip vyos_filter VYOS_INPUT_filter rule counter packets 1572 bytes 143239 accept comment "INP-filter default-action accept" (verdict accept)
+trace id 1d468fe0 inet trace prerouting packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 0 ip protocol tcp ip length 60 tcp sport 80 tcp dport 42396 tcp flags == 0x12 tcp window 65535 
+trace id 1d468fe0 inet trace prerouting rule ip protocol tcp meta nftrace set 1 (verdict continue)
+trace id 1d468fe0 inet trace prerouting verdict continue 
+trace id 1d468fe0 inet trace prerouting policy accept 
+trace id 1d468fe0 ip vyos_conntrack PREROUTING packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 0 ip length 60 tcp sport 80 tcp dport 42396 tcp flags == 0x12 tcp window 65535 
+trace id 1d468fe0 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump VYOS_CT_IGNORE (verdict jump VYOS_CT_IGNORE)
+trace id 1d468fe0 ip vyos_conntrack VYOS_CT_IGNORE verdict return 
+trace id 1d468fe0 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump FW_CONNTRACK (verdict jump FW_CONNTRACK)
+trace id 1d468fe0 ip vyos_conntrack FW_CONNTRACK verdict return 
+trace id 1d468fe0 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump NAT_CONNTRACK (verdict jump NAT_CONNTRACK)
+trace id 1d468fe0 ip vyos_conntrack NAT_CONNTRACK rule accept (verdict accept)
+trace id 1d468fe0 ip vyos_filter VYOS_PREROUTING_raw packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 0 ip length 60 tcp sport 80 tcp dport 42396 tcp flags == 0x12 tcp window 65535 
+trace id 1d468fe0 ip vyos_filter VYOS_PREROUTING_raw rule counter packets 1744 bytes 158911 accept comment "PRE-raw default-action accept" (verdict accept)
+trace id 1d468fe0 inet vrf_zones vrf_zones_ct_in packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 0 ip protocol tcp ip length 60 tcp sport 80 tcp dport 42396 tcp flags == 0x12 tcp window 65535 
+trace id 1d468fe0 inet vrf_zones vrf_zones_ct_in verdict continue 
+trace id 1d468fe0 inet vrf_zones vrf_zones_ct_in policy accept 
+trace id 1d468fe0 ip raw VYOS_PREROUTING_HOOK packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 0 ip length 60 tcp sport 80 tcp dport 42396 tcp flags == 0x12 tcp window 65535 
+trace id 1d468fe0 ip raw VYOS_PREROUTING_HOOK verdict continue 
+trace id 1d468fe0 ip raw VYOS_PREROUTING_HOOK policy accept 
+trace id 1d468fe0 ip raw vyos_rpfilter packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 0 ip length 60 tcp sport 80 tcp dport 42396 tcp flags == 0x12 tcp window 65535 
+trace id 1d468fe0 ip raw vyos_rpfilter rule counter packets 2151 bytes 191831 jump vyos_global_rpfilter (verdict jump vyos_global_rpfilter)
+trace id 1d468fe0 ip raw vyos_global_rpfilter verdict return 
+trace id 1d468fe0 ip raw vyos_rpfilter verdict continue 
+trace id 1d468fe0 ip raw vyos_rpfilter policy accept 
+trace id 1d468fe0 ip vyos_conntrack PREROUTING_HELPER packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 192.168.0.1 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 0 ip length 60 tcp sport 80 tcp dport 42396 tcp flags == 0x12 tcp window 65535 
+trace id 1d468fe0 ip vyos_conntrack PREROUTING_HELPER rule counter packets 1744 bytes 158911 jump VYOS_CT_HELPER (verdict jump VYOS_CT_HELPER)
+trace id 1d468fe0 ip vyos_conntrack VYOS_CT_HELPER verdict return 
+trace id 1d468fe0 ip vyos_conntrack PREROUTING_HELPER verdict continue 
+trace id 1d468fe0 ip vyos_conntrack PREROUTING_HELPER policy accept 
+trace id 1d468fe0 ip vyos_filter VYOS_INPUT_filter packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 192.168.0.1 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 0 ip length 60 tcp sport 80 tcp dport 42396 tcp flags == 0x12 tcp window 65535 
+trace id 1d468fe0 ip vyos_filter VYOS_INPUT_filter rule counter packets 1572 bytes 143239 accept comment "INP-filter default-action accept" (verdict accept)
+trace id 588836b9 inet trace prerouting packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 33886 ip protocol tcp ip length 52 tcp sport 80 tcp dport 42396 tcp flags == ack tcp window 1050 
+trace id 588836b9 inet trace prerouting rule ip protocol tcp meta nftrace set 1 (verdict continue)
+trace id 588836b9 inet trace prerouting verdict continue 
+trace id 588836b9 inet trace prerouting policy accept 
+trace id 588836b9 ip vyos_conntrack PREROUTING packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 33886 ip length 52 tcp sport 80 tcp dport 42396 tcp flags == ack tcp window 1050 
+trace id 588836b9 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump VYOS_CT_IGNORE (verdict jump VYOS_CT_IGNORE)
+trace id 588836b9 ip vyos_conntrack VYOS_CT_IGNORE verdict return 
+trace id 588836b9 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump FW_CONNTRACK (verdict jump FW_CONNTRACK)
+trace id 588836b9 ip vyos_conntrack FW_CONNTRACK verdict return 
+trace id 588836b9 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump NAT_CONNTRACK (verdict jump NAT_CONNTRACK)
+trace id 588836b9 ip vyos_conntrack NAT_CONNTRACK rule accept (verdict accept)
+trace id 588836b9 ip vyos_filter VYOS_PREROUTING_raw packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 33886 ip length 52 tcp sport 80 tcp dport 42396 tcp flags == ack tcp window 1050 
+trace id 588836b9 ip vyos_filter VYOS_PREROUTING_raw rule counter packets 1744 bytes 158911 accept comment "PRE-raw default-action accept" (verdict accept)
+trace id 588836b9 inet vrf_zones vrf_zones_ct_in packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 33886 ip protocol tcp ip length 52 tcp sport 80 tcp dport 42396 tcp flags == ack tcp window 1050 
+trace id 588836b9 inet vrf_zones vrf_zones_ct_in verdict continue 
+trace id 588836b9 inet vrf_zones vrf_zones_ct_in policy accept 
+trace id 588836b9 ip raw VYOS_PREROUTING_HOOK packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 33886 ip length 52 tcp sport 80 tcp dport 42396 tcp flags == ack tcp window 1050 
+trace id 588836b9 ip raw VYOS_PREROUTING_HOOK verdict continue 
+trace id 588836b9 ip raw VYOS_PREROUTING_HOOK policy accept 
+trace id 588836b9 ip raw vyos_rpfilter packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 33886 ip length 52 tcp sport 80 tcp dport 42396 tcp flags == ack tcp window 1050 
+trace id 588836b9 ip raw vyos_rpfilter rule counter packets 2151 bytes 191831 jump vyos_global_rpfilter (verdict jump vyos_global_rpfilter)
+trace id 588836b9 ip raw vyos_global_rpfilter verdict return 
+trace id 588836b9 ip raw vyos_rpfilter verdict continue 
+trace id 588836b9 ip raw vyos_rpfilter policy accept 
+trace id 588836b9 ip vyos_conntrack PREROUTING_HELPER packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 192.168.0.1 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 33886 ip length 52 tcp sport 80 tcp dport 42396 tcp flags == ack tcp window 1050 
+trace id 588836b9 ip vyos_conntrack PREROUTING_HELPER rule counter packets 1744 bytes 158911 jump VYOS_CT_HELPER (verdict jump VYOS_CT_HELPER)
+trace id 588836b9 ip vyos_conntrack VYOS_CT_HELPER verdict return 
+trace id 588836b9 ip vyos_conntrack PREROUTING_HELPER verdict continue 
+trace id 588836b9 ip vyos_conntrack PREROUTING_HELPER policy accept 
+trace id 588836b9 ip vyos_filter VYOS_INPUT_filter packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 192.168.0.1 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 33886 ip length 52 tcp sport 80 tcp dport 42396 tcp flags == ack tcp window 1050 
+trace id 588836b9 ip vyos_filter VYOS_INPUT_filter rule counter packets 1572 bytes 143239 accept comment "INP-filter default-action accept" (verdict accept)
+trace id 8acbdbd5 inet trace prerouting packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 33887 ip protocol tcp ip length 694 tcp sport 80 tcp dport 42396 tcp flags == 0x18 tcp window 1050 
+trace id 8acbdbd5 inet trace prerouting rule ip protocol tcp meta nftrace set 1 (verdict continue)
+trace id 8acbdbd5 inet trace prerouting verdict continue 
+trace id 8acbdbd5 inet trace prerouting policy accept 
+trace id 8acbdbd5 ip vyos_conntrack PREROUTING packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 33887 ip length 694 tcp sport 80 tcp dport 42396 tcp flags == 0x18 tcp window 1050 
+trace id 8acbdbd5 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump VYOS_CT_IGNORE (verdict jump VYOS_CT_IGNORE)
+trace id 8acbdbd5 ip vyos_conntrack VYOS_CT_IGNORE verdict return 
+trace id 8acbdbd5 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump FW_CONNTRACK (verdict jump FW_CONNTRACK)
+trace id 8acbdbd5 ip vyos_conntrack FW_CONNTRACK verdict return 
+trace id 8acbdbd5 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump NAT_CONNTRACK (verdict jump NAT_CONNTRACK)
+trace id 8acbdbd5 ip vyos_conntrack NAT_CONNTRACK rule accept (verdict accept)
+trace id 8acbdbd5 ip vyos_filter VYOS_PREROUTING_raw packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 33887 ip length 694 tcp sport 80 tcp dport 42396 tcp flags == 0x18 tcp window 1050 
+trace id 8acbdbd5 ip vyos_filter VYOS_PREROUTING_raw rule counter packets 1744 bytes 158911 accept comment "PRE-raw default-action accept" (verdict accept)
+trace id 8acbdbd5 inet vrf_zones vrf_zones_ct_in packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 33887 ip protocol tcp ip length 694 tcp sport 80 tcp dport 42396 tcp flags == 0x18 tcp window 1050 
+trace id 8acbdbd5 inet vrf_zones vrf_zones_ct_in verdict continue 
+trace id 8acbdbd5 inet vrf_zones vrf_zones_ct_in policy accept 
+trace id 8acbdbd5 ip raw VYOS_PREROUTING_HOOK packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 33887 ip length 694 tcp sport 80 tcp dport 42396 tcp flags == 0x18 tcp window 1050 
+trace id 8acbdbd5 ip raw VYOS_PREROUTING_HOOK verdict continue 
+trace id 8acbdbd5 ip raw VYOS_PREROUTING_HOOK policy accept 
+trace id 8acbdbd5 ip raw vyos_rpfilter packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 33887 ip length 694 tcp sport 80 tcp dport 42396 tcp flags == 0x18 tcp window 1050 
+trace id 8acbdbd5 ip raw vyos_rpfilter rule counter packets 2151 bytes 191831 jump vyos_global_rpfilter (verdict jump vyos_global_rpfilter)
+trace id 8acbdbd5 ip raw vyos_global_rpfilter verdict return 
+trace id 8acbdbd5 ip raw vyos_rpfilter verdict continue 
+trace id 8acbdbd5 ip raw vyos_rpfilter policy accept 
+trace id 8acbdbd5 ip vyos_conntrack PREROUTING_HELPER packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 192.168.0.1 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 33887 ip length 694 tcp sport 80 tcp dport 42396 tcp flags == 0x18 tcp window 1050 
+trace id 8acbdbd5 ip vyos_conntrack PREROUTING_HELPER rule counter packets 1744 bytes 158911 jump VYOS_CT_HELPER (verdict jump VYOS_CT_HELPER)
+trace id 8acbdbd5 ip vyos_conntrack VYOS_CT_HELPER verdict return 
+trace id 8acbdbd5 ip vyos_conntrack PREROUTING_HELPER verdict continue 
+trace id 8acbdbd5 ip vyos_conntrack PREROUTING_HELPER policy accept 
+trace id 8acbdbd5 ip vyos_filter VYOS_INPUT_filter packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 192.168.0.1 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 33887 ip length 694 tcp sport 80 tcp dport 42396 tcp flags == 0x18 tcp window 1050 
+trace id 8acbdbd5 ip vyos_filter VYOS_INPUT_filter rule counter packets 1572 bytes 143239 accept comment "INP-filter default-action accept" (verdict accept)
+trace id 06801f96 inet trace prerouting packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32807 ip protocol tcp ip length 40 tcp sport 29710 tcp dport 22 tcp flags == ack tcp window 8207 
+trace id 06801f96 inet trace prerouting rule ip protocol tcp meta nftrace set 1 (verdict continue)
+trace id 06801f96 inet trace prerouting verdict continue 
+trace id 06801f96 inet trace prerouting policy accept 
+trace id 06801f96 ip vyos_conntrack PREROUTING packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32807 ip length 40 tcp sport 29710 tcp dport 22 tcp flags == ack tcp window 8207 
+trace id 06801f96 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump VYOS_CT_IGNORE (verdict jump VYOS_CT_IGNORE)
+trace id 06801f96 ip vyos_conntrack VYOS_CT_IGNORE verdict return 
+trace id 06801f96 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump FW_CONNTRACK (verdict jump FW_CONNTRACK)
+trace id 06801f96 ip vyos_conntrack FW_CONNTRACK verdict return 
+trace id 06801f96 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump NAT_CONNTRACK (verdict jump NAT_CONNTRACK)
+trace id 06801f96 ip vyos_conntrack NAT_CONNTRACK rule accept (verdict accept)
+trace id 06801f96 ip vyos_filter VYOS_PREROUTING_raw packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32807 ip length 40 tcp sport 29710 tcp dport 22 tcp flags == ack tcp window 8207 
+trace id 06801f96 ip vyos_filter VYOS_PREROUTING_raw rule counter packets 1744 bytes 158911 accept comment "PRE-raw default-action accept" (verdict accept)
+trace id 06801f96 inet vrf_zones vrf_zones_ct_in packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32807 ip protocol tcp ip length 40 tcp sport 29710 tcp dport 22 tcp flags == ack tcp window 8207 
+trace id 06801f96 inet vrf_zones vrf_zones_ct_in verdict continue 
+trace id 06801f96 inet vrf_zones vrf_zones_ct_in policy accept 
+trace id 06801f96 ip raw VYOS_PREROUTING_HOOK packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32807 ip length 40 tcp sport 29710 tcp dport 22 tcp flags == ack tcp window 8207 
+trace id 06801f96 ip raw VYOS_PREROUTING_HOOK verdict continue 
+trace id 06801f96 ip raw VYOS_PREROUTING_HOOK policy accept 
+trace id 06801f96 ip raw vyos_rpfilter packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32807 ip length 40 tcp sport 29710 tcp dport 22 tcp flags == ack tcp window 8207 
+trace id 06801f96 ip raw vyos_rpfilter rule counter packets 2151 bytes 191831 jump vyos_global_rpfilter (verdict jump vyos_global_rpfilter)
+trace id 06801f96 ip raw vyos_global_rpfilter verdict return 
+trace id 06801f96 ip raw vyos_rpfilter verdict continue 
+trace id 06801f96 ip raw vyos_rpfilter policy accept 
+trace id 06801f96 ip vyos_conntrack PREROUTING_HELPER packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32807 ip length 40 tcp sport 29710 tcp dport 22 tcp flags == ack tcp window 8207 
+trace id 06801f96 ip vyos_conntrack PREROUTING_HELPER rule counter packets 1744 bytes 158911 jump VYOS_CT_HELPER (verdict jump VYOS_CT_HELPER)
+trace id 06801f96 ip vyos_conntrack VYOS_CT_HELPER verdict return 
+trace id 06801f96 ip vyos_conntrack PREROUTING_HELPER verdict continue 
+trace id 06801f96 ip vyos_conntrack PREROUTING_HELPER policy accept 
+trace id 06801f96 ip vyos_filter VYOS_INPUT_filter packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32807 ip length 40 tcp sport 29710 tcp dport 22 tcp flags == ack tcp window 8207 
+trace id 06801f96 ip vyos_filter VYOS_INPUT_filter rule counter packets 1572 bytes 143239 accept comment "INP-filter default-action accept" (verdict accept)
+trace id 8acbdbd5 inet trace prerouting packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 33888 ip protocol tcp ip length 52 tcp sport 80 tcp dport 42396 tcp flags == 0x11 tcp window 1050 
+trace id 8acbdbd5 inet trace prerouting rule ip protocol tcp meta nftrace set 1 (verdict continue)
+trace id 8acbdbd5 inet trace prerouting verdict continue 
+trace id 8acbdbd5 inet trace prerouting policy accept 
+trace id 8acbdbd5 ip vyos_conntrack PREROUTING packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 33888 ip length 52 tcp sport 80 tcp dport 42396 tcp flags == 0x11 tcp window 1050 
+trace id 8acbdbd5 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump VYOS_CT_IGNORE (verdict jump VYOS_CT_IGNORE)
+trace id 8acbdbd5 ip vyos_conntrack VYOS_CT_IGNORE verdict return 
+trace id 8acbdbd5 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump FW_CONNTRACK (verdict jump FW_CONNTRACK)
+trace id 8acbdbd5 ip vyos_conntrack FW_CONNTRACK verdict return 
+trace id 8acbdbd5 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump NAT_CONNTRACK (verdict jump NAT_CONNTRACK)
+trace id 8acbdbd5 ip vyos_conntrack NAT_CONNTRACK rule accept (verdict accept)
+trace id 8acbdbd5 ip vyos_filter VYOS_PREROUTING_raw packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 33888 ip length 52 tcp sport 80 tcp dport 42396 tcp flags == 0x11 tcp window 1050 
+trace id 8acbdbd5 ip vyos_filter VYOS_PREROUTING_raw rule counter packets 1744 bytes 158911 accept comment "PRE-raw default-action accept" (verdict accept)
+trace id 8acbdbd5 inet vrf_zones vrf_zones_ct_in packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 33888 ip protocol tcp ip length 52 tcp sport 80 tcp dport 42396 tcp flags == 0x11 tcp window 1050 
+trace id 8acbdbd5 inet vrf_zones vrf_zones_ct_in verdict continue 
+trace id 8acbdbd5 inet vrf_zones vrf_zones_ct_in policy accept 
+trace id 8acbdbd5 ip raw VYOS_PREROUTING_HOOK packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 33888 ip length 52 tcp sport 80 tcp dport 42396 tcp flags == 0x11 tcp window 1050 
+trace id 8acbdbd5 ip raw VYOS_PREROUTING_HOOK verdict continue 
+trace id 8acbdbd5 ip raw VYOS_PREROUTING_HOOK policy accept 
+trace id 8acbdbd5 ip raw vyos_rpfilter packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 33888 ip length 52 tcp sport 80 tcp dport 42396 tcp flags == 0x11 tcp window 1050 
+trace id 8acbdbd5 ip raw vyos_rpfilter rule counter packets 2151 bytes 191831 jump vyos_global_rpfilter (verdict jump vyos_global_rpfilter)
+trace id 8acbdbd5 ip raw vyos_global_rpfilter verdict return 
+trace id 8acbdbd5 ip raw vyos_rpfilter verdict continue 
+trace id 8acbdbd5 ip raw vyos_rpfilter policy accept 
+trace id 8acbdbd5 ip vyos_conntrack PREROUTING_HELPER packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 192.168.0.1 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 33888 ip length 52 tcp sport 80 tcp dport 42396 tcp flags == 0x11 tcp window 1050 
+trace id 8acbdbd5 ip vyos_conntrack PREROUTING_HELPER rule counter packets 1744 bytes 158911 jump VYOS_CT_HELPER (verdict jump VYOS_CT_HELPER)
+trace id 8acbdbd5 ip vyos_conntrack VYOS_CT_HELPER verdict return 
+trace id 8acbdbd5 ip vyos_conntrack PREROUTING_HELPER verdict continue 
+trace id 8acbdbd5 ip vyos_conntrack PREROUTING_HELPER policy accept 
+trace id 8acbdbd5 ip vyos_filter VYOS_INPUT_filter packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 192.168.0.1 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 33888 ip length 52 tcp sport 80 tcp dport 42396 tcp flags == 0x11 tcp window 1050 
+trace id 8acbdbd5 ip vyos_filter VYOS_INPUT_filter rule counter packets 1572 bytes 143239 accept comment "INP-filter default-action accept" (verdict accept)
+trace id d174c585 inet trace prerouting packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32808 ip protocol tcp ip length 40 tcp sport 29710 tcp dport 22 tcp flags == ack tcp window 8207 
+trace id d174c585 inet trace prerouting rule ip protocol tcp meta nftrace set 1 (verdict continue)
+trace id d174c585 inet trace prerouting verdict continue 
+trace id d174c585 inet trace prerouting policy accept 
+trace id d174c585 ip vyos_conntrack PREROUTING packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32808 ip length 40 tcp sport 29710 tcp dport 22 tcp flags == ack tcp window 8207 
+trace id d174c585 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump VYOS_CT_IGNORE (verdict jump VYOS_CT_IGNORE)
+trace id d174c585 ip vyos_conntrack VYOS_CT_IGNORE verdict return 
+trace id d174c585 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump FW_CONNTRACK (verdict jump FW_CONNTRACK)
+trace id d174c585 ip vyos_conntrack FW_CONNTRACK verdict return 
+trace id d174c585 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump NAT_CONNTRACK (verdict jump NAT_CONNTRACK)
+trace id d174c585 ip vyos_conntrack NAT_CONNTRACK rule accept (verdict accept)
+trace id d174c585 ip vyos_filter VYOS_PREROUTING_raw packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32808 ip length 40 tcp sport 29710 tcp dport 22 tcp flags == ack tcp window 8207 
+trace id d174c585 ip vyos_filter VYOS_PREROUTING_raw rule counter packets 1744 bytes 158911 accept comment "PRE-raw default-action accept" (verdict accept)
+trace id d174c585 inet vrf_zones vrf_zones_ct_in packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32808 ip protocol tcp ip length 40 tcp sport 29710 tcp dport 22 tcp flags == ack tcp window 8207 
+trace id d174c585 inet vrf_zones vrf_zones_ct_in verdict continue 
+trace id d174c585 inet vrf_zones vrf_zones_ct_in policy accept 
+trace id d174c585 ip raw VYOS_PREROUTING_HOOK packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32808 ip length 40 tcp sport 29710 tcp dport 22 tcp flags == ack tcp window 8207 
+trace id d174c585 ip raw VYOS_PREROUTING_HOOK verdict continue 
+trace id d174c585 ip raw VYOS_PREROUTING_HOOK policy accept 
+trace id d174c585 ip raw vyos_rpfilter packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32808 ip length 40 tcp sport 29710 tcp dport 22 tcp flags == ack tcp window 8207 
+trace id d174c585 ip raw vyos_rpfilter rule counter packets 2151 bytes 191831 jump vyos_global_rpfilter (verdict jump vyos_global_rpfilter)
+trace id d174c585 ip raw vyos_global_rpfilter verdict return 
+trace id d174c585 ip raw vyos_rpfilter verdict continue 
+trace id d174c585 ip raw vyos_rpfilter policy accept 
+trace id d174c585 ip vyos_conntrack PREROUTING_HELPER packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32808 ip length 40 tcp sport 29710 tcp dport 22 tcp flags == ack tcp window 8207 
+trace id d174c585 ip vyos_conntrack PREROUTING_HELPER rule counter packets 1744 bytes 158911 jump VYOS_CT_HELPER (verdict jump VYOS_CT_HELPER)
+trace id d174c585 ip vyos_conntrack VYOS_CT_HELPER verdict return 
+trace id d174c585 ip vyos_conntrack PREROUTING_HELPER verdict continue 
+trace id d174c585 ip vyos_conntrack PREROUTING_HELPER policy accept 
+trace id d174c585 ip vyos_filter VYOS_INPUT_filter packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32808 ip length 40 tcp sport 29710 tcp dport 22 tcp flags == ack tcp window 8207 
+trace id d174c585 ip vyos_filter VYOS_INPUT_filter rule counter packets 1572 bytes 143239 accept comment "INP-filter default-action accept" (verdict accept)
+trace id 7e990d81 inet trace prerouting packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 192.168.0.1 ip dscp cs0 ip ecn not-ect ip ttl 52 ip id 56137 ip protocol tcp ip length 44 tcp sport 36665 tcp dport 22 tcp flags == syn tcp window 1024 
+trace id 7e990d81 inet trace prerouting rule ip protocol tcp meta nftrace set 1 (verdict continue)
+trace id 7e990d81 inet trace prerouting verdict continue 
+trace id 7e990d81 inet trace prerouting policy accept 
+trace id 7e990d81 ip vyos_conntrack PREROUTING packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 192.168.0.1 ip dscp cs0 ip ecn not-ect ip ttl 52 ip id 56137 ip length 44 tcp sport 36665 tcp dport 22 tcp flags == syn tcp window 1024 
+trace id 7e990d81 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump VYOS_CT_IGNORE (verdict jump VYOS_CT_IGNORE)
+trace id 7e990d81 ip vyos_conntrack VYOS_CT_IGNORE verdict return 
+trace id 7e990d81 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump FW_CONNTRACK (verdict jump FW_CONNTRACK)
+trace id 7e990d81 ip vyos_conntrack FW_CONNTRACK verdict return 
+trace id 7e990d81 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump NAT_CONNTRACK (verdict jump NAT_CONNTRACK)
+trace id 7e990d81 ip vyos_conntrack NAT_CONNTRACK rule accept (verdict accept)
+trace id 7e990d81 ip vyos_filter VYOS_PREROUTING_raw packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 192.168.0.1 ip dscp cs0 ip ecn not-ect ip ttl 52 ip id 56137 ip length 44 tcp sport 36665 tcp dport 22 tcp flags == syn tcp window 1024 
+trace id 7e990d81 ip vyos_filter VYOS_PREROUTING_raw rule counter packets 1744 bytes 158911 accept comment "PRE-raw default-action accept" (verdict accept)
+trace id 7e990d81 inet vrf_zones vrf_zones_ct_in packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 192.168.0.1 ip dscp cs0 ip ecn not-ect ip ttl 52 ip id 56137 ip protocol tcp ip length 44 tcp sport 36665 tcp dport 22 tcp flags == syn tcp window 1024 
+trace id 7e990d81 inet vrf_zones vrf_zones_ct_in verdict continue 
+trace id 7e990d81 inet vrf_zones vrf_zones_ct_in policy accept 
+trace id 7e990d81 ip raw VYOS_PREROUTING_HOOK packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 192.168.0.1 ip dscp cs0 ip ecn not-ect ip ttl 52 ip id 56137 ip length 44 tcp sport 36665 tcp dport 22 tcp flags == syn tcp window 1024 
+trace id 7e990d81 ip raw VYOS_PREROUTING_HOOK verdict continue 
+trace id 7e990d81 ip raw VYOS_PREROUTING_HOOK policy accept 
+trace id 7e990d81 ip raw vyos_rpfilter packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 192.168.0.1 ip dscp cs0 ip ecn not-ect ip ttl 52 ip id 56137 ip length 44 tcp sport 36665 tcp dport 22 tcp flags == syn tcp window 1024 
+trace id 7e990d81 ip raw vyos_rpfilter rule counter packets 2151 bytes 191831 jump vyos_global_rpfilter (verdict jump vyos_global_rpfilter)
+trace id 7e990d81 ip raw vyos_global_rpfilter verdict return 
+trace id 7e990d81 ip raw vyos_rpfilter verdict continue 
+trace id 7e990d81 ip raw vyos_rpfilter policy accept 
+trace id 7e990d81 ip vyos_static_nat PREROUTING packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 192.168.0.1 ip dscp cs0 ip ecn not-ect ip ttl 52 ip id 56137 ip length 44 tcp sport 36665 tcp dport 22 tcp flags == syn tcp window 1024 
+trace id 7e990d81 ip vyos_static_nat PREROUTING verdict continue 
+trace id 7e990d81 ip vyos_static_nat PREROUTING policy accept 
+trace id 7e990d81 ip vyos_nat PREROUTING packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 192.168.0.1 ip dscp cs0 ip ecn not-ect ip ttl 52 ip id 56137 ip length 44 tcp sport 36665 tcp dport 22 tcp flags == syn tcp window 1024 
+trace id 7e990d81 ip vyos_nat PREROUTING rule counter packets 226 bytes 15733 jump VYOS_PRE_DNAT_HOOK (verdict jump VYOS_PRE_DNAT_HOOK)
+trace id 7e990d81 ip vyos_nat VYOS_PRE_DNAT_HOOK verdict return 
+trace id 7e990d81 ip vyos_nat PREROUTING verdict continue 
+trace id 7e990d81 ip vyos_nat PREROUTING policy accept 
+trace id 7e990d81 ip vyos_conntrack PREROUTING_HELPER packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 192.168.0.1 ip dscp cs0 ip ecn not-ect ip ttl 52 ip id 56137 ip length 44 tcp sport 36665 tcp dport 22 tcp flags == syn tcp window 1024 
+trace id 7e990d81 ip vyos_conntrack PREROUTING_HELPER rule counter packets 1744 bytes 158911 jump VYOS_CT_HELPER (verdict jump VYOS_CT_HELPER)
+trace id 7e990d81 ip vyos_conntrack VYOS_CT_HELPER verdict return 
+trace id 7e990d81 ip vyos_conntrack PREROUTING_HELPER verdict continue 
+trace id 7e990d81 ip vyos_conntrack PREROUTING_HELPER policy accept 
+trace id 7e990d81 ip vyos_filter VYOS_INPUT_filter packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 192.168.0.1 ip dscp cs0 ip ecn not-ect ip ttl 52 ip id 56137 ip length 44 tcp sport 36665 tcp dport 22 tcp flags == syn tcp window 1024 
+trace id 7e990d81 ip vyos_filter VYOS_INPUT_filter rule counter packets 1572 bytes 143239 accept comment "INP-filter default-action accept" (verdict accept)
+trace id b7deed8f inet trace prerouting packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 192.168.0.1 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 0 ip protocol tcp ip length 40 tcp sport 36665 tcp dport 22 tcp flags == rst tcp window 0 
+trace id b7deed8f inet trace prerouting rule ip protocol tcp meta nftrace set 1 (verdict continue)
+trace id b7deed8f inet trace prerouting verdict continue 
+trace id b7deed8f inet trace prerouting policy accept 
+trace id b7deed8f ip vyos_conntrack PREROUTING packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 192.168.0.1 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 0 ip length 40 tcp sport 36665 tcp dport 22 tcp flags == rst tcp window 0 
+trace id b7deed8f ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump VYOS_CT_IGNORE (verdict jump VYOS_CT_IGNORE)
+trace id b7deed8f ip vyos_conntrack VYOS_CT_IGNORE verdict return 
+trace id b7deed8f ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump FW_CONNTRACK (verdict jump FW_CONNTRACK)
+trace id b7deed8f ip vyos_conntrack FW_CONNTRACK verdict return 
+trace id b7deed8f ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump NAT_CONNTRACK (verdict jump NAT_CONNTRACK)
+trace id b7deed8f ip vyos_conntrack NAT_CONNTRACK rule accept (verdict accept)
+trace id b7deed8f ip vyos_filter VYOS_PREROUTING_raw packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 192.168.0.1 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 0 ip length 40 tcp sport 36665 tcp dport 22 tcp flags == rst tcp window 0 
+trace id b7deed8f ip vyos_filter VYOS_PREROUTING_raw rule counter packets 1744 bytes 158911 accept comment "PRE-raw default-action accept" (verdict accept)
+trace id b7deed8f inet vrf_zones vrf_zones_ct_in packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 192.168.0.1 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 0 ip protocol tcp ip length 40 tcp sport 36665 tcp dport 22 tcp flags == rst tcp window 0 
+trace id b7deed8f inet vrf_zones vrf_zones_ct_in verdict continue 
+trace id b7deed8f inet vrf_zones vrf_zones_ct_in policy accept 
+trace id b7deed8f ip raw VYOS_PREROUTING_HOOK packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 192.168.0.1 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 0 ip length 40 tcp sport 36665 tcp dport 22 tcp flags == rst tcp window 0 
+trace id b7deed8f ip raw VYOS_PREROUTING_HOOK verdict continue 
+trace id b7deed8f ip raw VYOS_PREROUTING_HOOK policy accept 
+trace id b7deed8f ip raw vyos_rpfilter packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 192.168.0.1 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 0 ip length 40 tcp sport 36665 tcp dport 22 tcp flags == rst tcp window 0 
+trace id b7deed8f ip raw vyos_rpfilter rule counter packets 2151 bytes 191831 jump vyos_global_rpfilter (verdict jump vyos_global_rpfilter)
+trace id b7deed8f ip raw vyos_global_rpfilter verdict return 
+trace id b7deed8f ip raw vyos_rpfilter verdict continue 
+trace id b7deed8f ip raw vyos_rpfilter policy accept 
+trace id b7deed8f ip vyos_conntrack PREROUTING_HELPER packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 192.168.0.1 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 0 ip length 40 tcp sport 36665 tcp dport 22 tcp flags == rst tcp window 0 
+trace id b7deed8f ip vyos_conntrack PREROUTING_HELPER rule counter packets 1744 bytes 158911 jump VYOS_CT_HELPER (verdict jump VYOS_CT_HELPER)
+trace id b7deed8f ip vyos_conntrack VYOS_CT_HELPER verdict return 
+trace id b7deed8f ip vyos_conntrack PREROUTING_HELPER verdict continue 
+trace id b7deed8f ip vyos_conntrack PREROUTING_HELPER policy accept 
+trace id b7deed8f ip vyos_filter VYOS_INPUT_filter packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 192.168.0.1 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 0 ip length 40 tcp sport 36665 tcp dport 22 tcp flags == rst tcp window 0 
+trace id b7deed8f ip vyos_filter VYOS_INPUT_filter rule counter packets 1572 bytes 143239 accept comment "INP-filter default-action accept" (verdict accept)
+trace id 6af521c6 inet trace prerouting packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47874 ip protocol tcp ip length 60 tcp sport 40804 tcp dport 80 tcp flags == syn tcp window 64240 
+trace id 6af521c6 inet trace prerouting rule ip protocol tcp meta nftrace set 1 (verdict continue)
+trace id 6af521c6 inet trace prerouting verdict continue 
+trace id 6af521c6 inet trace prerouting policy accept 
+trace id 6af521c6 ip vyos_conntrack PREROUTING packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47874 ip length 60 tcp sport 40804 tcp dport 80 tcp flags == syn tcp window 64240 
+trace id 6af521c6 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump VYOS_CT_IGNORE (verdict jump VYOS_CT_IGNORE)
+trace id 6af521c6 ip vyos_conntrack VYOS_CT_IGNORE verdict return 
+trace id 6af521c6 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump FW_CONNTRACK (verdict jump FW_CONNTRACK)
+trace id 6af521c6 ip vyos_conntrack FW_CONNTRACK verdict return 
+trace id 6af521c6 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump NAT_CONNTRACK (verdict jump NAT_CONNTRACK)
+trace id 6af521c6 ip vyos_conntrack NAT_CONNTRACK rule accept (verdict accept)
+trace id 6af521c6 ip vyos_filter VYOS_PREROUTING_raw packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47874 ip length 60 tcp sport 40804 tcp dport 80 tcp flags == syn tcp window 64240 
+trace id 6af521c6 ip vyos_filter VYOS_PREROUTING_raw rule counter packets 1744 bytes 158911 accept comment "PRE-raw default-action accept" (verdict accept)
+trace id 6af521c6 inet vrf_zones vrf_zones_ct_in packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47874 ip protocol tcp ip length 60 tcp sport 40804 tcp dport 80 tcp flags == syn tcp window 64240 
+trace id 6af521c6 inet vrf_zones vrf_zones_ct_in verdict continue 
+trace id 6af521c6 inet vrf_zones vrf_zones_ct_in policy accept 
+trace id 6af521c6 ip raw VYOS_PREROUTING_HOOK packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47874 ip length 60 tcp sport 40804 tcp dport 80 tcp flags == syn tcp window 64240 
+trace id 6af521c6 ip raw VYOS_PREROUTING_HOOK verdict continue 
+trace id 6af521c6 ip raw VYOS_PREROUTING_HOOK policy accept 
+trace id 6af521c6 ip raw vyos_rpfilter packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47874 ip length 60 tcp sport 40804 tcp dport 80 tcp flags == syn tcp window 64240 
+trace id 6af521c6 ip raw vyos_rpfilter rule counter packets 2151 bytes 191831 jump vyos_global_rpfilter (verdict jump vyos_global_rpfilter)
+trace id 6af521c6 ip raw vyos_global_rpfilter verdict return 
+trace id 6af521c6 ip raw vyos_rpfilter verdict continue 
+trace id 6af521c6 ip raw vyos_rpfilter policy accept 
+trace id 6af521c6 ip vyos_static_nat PREROUTING packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47874 ip length 60 tcp sport 40804 tcp dport 80 tcp flags == syn tcp window 64240 
+trace id 6af521c6 ip vyos_static_nat PREROUTING verdict continue 
+trace id 6af521c6 ip vyos_static_nat PREROUTING policy accept 
+trace id 6af521c6 ip vyos_nat PREROUTING packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47874 ip length 60 tcp sport 40804 tcp dport 80 tcp flags == syn tcp window 64240 
+trace id 6af521c6 ip vyos_nat PREROUTING rule counter packets 226 bytes 15733 jump VYOS_PRE_DNAT_HOOK (verdict jump VYOS_PRE_DNAT_HOOK)
+trace id 6af521c6 ip vyos_nat VYOS_PRE_DNAT_HOOK verdict return 
+trace id 6af521c6 ip vyos_nat PREROUTING verdict continue 
+trace id 6af521c6 ip vyos_nat PREROUTING policy accept 
+trace id 6af521c6 ip vyos_conntrack PREROUTING_HELPER packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47874 ip length 60 tcp sport 40804 tcp dport 80 tcp flags == syn tcp window 64240 
+trace id 6af521c6 ip vyos_conntrack PREROUTING_HELPER rule counter packets 1744 bytes 158911 jump VYOS_CT_HELPER (verdict jump VYOS_CT_HELPER)
+trace id 6af521c6 ip vyos_conntrack VYOS_CT_HELPER verdict return 
+trace id 6af521c6 ip vyos_conntrack PREROUTING_HELPER verdict continue 
+trace id 6af521c6 ip vyos_conntrack PREROUTING_HELPER policy accept 
+trace id 6af521c6 inet mangle FORWARD packet: iif "eth1" oif "eth0" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 63 ip id 47874 ip protocol tcp ip length 60 tcp sport 40804 tcp dport 80 tcp flags == syn tcp window 64240 
+trace id 6af521c6 inet mangle FORWARD verdict continue 
+trace id 6af521c6 inet mangle FORWARD policy accept 
+trace id 6af521c6 ip vyos_filter VYOS_FORWARD_filter packet: iif "eth1" oif "eth0" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 63 ip id 47874 ip length 60 tcp sport 40804 tcp dport 80 tcp flags == syn tcp window 64240 
+trace id 6af521c6 ip vyos_filter VYOS_FORWARD_filter rule counter packets 172 bytes 15672 accept comment "FWD-filter default-action accept" (verdict accept)
+trace id 6af521c6 ip raw VYOS_TCP_MSS packet: iif "eth1" oif "eth0" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 63 ip id 47874 ip length 60 tcp sport 40804 tcp dport 80 tcp flags == syn tcp window 64240 
+trace id 6af521c6 ip raw VYOS_TCP_MSS verdict continue 
+trace id 6af521c6 ip raw VYOS_TCP_MSS policy accept 
+trace id 6af521c6 ip nat VYOS_PRE_SNAT_HOOK packet: iif "eth1" oif "eth0" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 63 ip id 47874 ip length 60 tcp sport 40804 tcp dport 80 tcp flags == syn tcp window 64240 
+trace id 6af521c6 ip nat VYOS_PRE_SNAT_HOOK verdict return 
+trace id 6af521c6 ip nat VYOS_PRE_SNAT_HOOK policy accept 
+trace id 6af521c6 ip vyos_static_nat POSTROUTING packet: iif "eth1" oif "eth0" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 63 ip id 47874 ip length 60 tcp sport 40804 tcp dport 80 tcp flags == syn tcp window 64240 
+trace id 6af521c6 ip vyos_static_nat POSTROUTING verdict continue 
+trace id 6af521c6 ip vyos_static_nat POSTROUTING policy accept 
+trace id 6af521c6 ip vyos_nat POSTROUTING packet: iif "eth1" oif "eth0" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 63 ip id 47874 ip length 60 tcp sport 40804 tcp dport 80 tcp flags == syn tcp window 64240 
+trace id 6af521c6 ip vyos_nat POSTROUTING rule ip saddr 192.168.0.0/16 ip protocol tcp log prefix "nat test" (verdict continue)
+trace id 6af521c6 ip vyos_nat POSTROUTING rule counter packets 292 bytes 20006 jump VYOS_PRE_SNAT_HOOK (verdict jump VYOS_PRE_SNAT_HOOK)
+trace id 6af521c6 ip vyos_nat VYOS_PRE_SNAT_HOOK verdict return 
+trace id 6af521c6 ip vyos_nat POSTROUTING rule oifname "eth0" ip saddr 192.168.0.0/16 counter packets 220 bytes 14881 masquerade comment "SRC-NAT-10" (verdict accept)
+trace id 56c0a46f inet trace prerouting packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 0 ip protocol tcp ip length 60 tcp sport 80 tcp dport 40804 tcp flags == 0x12 tcp window 65535 
+trace id 56c0a46f inet trace prerouting rule ip protocol tcp meta nftrace set 1 (verdict continue)
+trace id 56c0a46f inet trace prerouting verdict continue 
+trace id 56c0a46f inet trace prerouting policy accept 
+trace id 56c0a46f ip vyos_conntrack PREROUTING packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 0 ip length 60 tcp sport 80 tcp dport 40804 tcp flags == 0x12 tcp window 65535 
+trace id 56c0a46f ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump VYOS_CT_IGNORE (verdict jump VYOS_CT_IGNORE)
+trace id 56c0a46f ip vyos_conntrack VYOS_CT_IGNORE verdict return 
+trace id 56c0a46f ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump FW_CONNTRACK (verdict jump FW_CONNTRACK)
+trace id 56c0a46f ip vyos_conntrack FW_CONNTRACK verdict return 
+trace id 56c0a46f ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump NAT_CONNTRACK (verdict jump NAT_CONNTRACK)
+trace id 56c0a46f ip vyos_conntrack NAT_CONNTRACK rule accept (verdict accept)
+trace id 56c0a46f ip vyos_filter VYOS_PREROUTING_raw packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 0 ip length 60 tcp sport 80 tcp dport 40804 tcp flags == 0x12 tcp window 65535 
+trace id 56c0a46f ip vyos_filter VYOS_PREROUTING_raw rule counter packets 1744 bytes 158911 accept comment "PRE-raw default-action accept" (verdict accept)
+trace id 56c0a46f inet vrf_zones vrf_zones_ct_in packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 0 ip protocol tcp ip length 60 tcp sport 80 tcp dport 40804 tcp flags == 0x12 tcp window 65535 
+trace id 56c0a46f inet vrf_zones vrf_zones_ct_in verdict continue 
+trace id 56c0a46f inet vrf_zones vrf_zones_ct_in policy accept 
+trace id 56c0a46f ip raw VYOS_PREROUTING_HOOK packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 0 ip length 60 tcp sport 80 tcp dport 40804 tcp flags == 0x12 tcp window 65535 
+trace id 56c0a46f ip raw VYOS_PREROUTING_HOOK verdict continue 
+trace id 56c0a46f ip raw VYOS_PREROUTING_HOOK policy accept 
+trace id 56c0a46f ip raw vyos_rpfilter packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 0 ip length 60 tcp sport 80 tcp dport 40804 tcp flags == 0x12 tcp window 65535 
+trace id 56c0a46f ip raw vyos_rpfilter rule counter packets 2151 bytes 191831 jump vyos_global_rpfilter (verdict jump vyos_global_rpfilter)
+trace id 56c0a46f ip raw vyos_global_rpfilter verdict return 
+trace id 56c0a46f ip raw vyos_rpfilter verdict continue 
+trace id 56c0a46f ip raw vyos_rpfilter policy accept 
+trace id 56c0a46f ip vyos_conntrack PREROUTING_HELPER packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 192.168.0.50 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 0 ip length 60 tcp sport 80 tcp dport 40804 tcp flags == 0x12 tcp window 65535 
+trace id 56c0a46f ip vyos_conntrack PREROUTING_HELPER rule counter packets 1744 bytes 158911 jump VYOS_CT_HELPER (verdict jump VYOS_CT_HELPER)
+trace id 56c0a46f ip vyos_conntrack VYOS_CT_HELPER verdict return 
+trace id 56c0a46f ip vyos_conntrack PREROUTING_HELPER verdict continue 
+trace id 56c0a46f ip vyos_conntrack PREROUTING_HELPER policy accept 
+trace id 56c0a46f inet mangle FORWARD packet: iif "eth0" oif "eth1" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 192.168.0.50 ip dscp cs3 ip ecn not-ect ip ttl 122 ip id 0 ip protocol tcp ip length 60 tcp sport 80 tcp dport 40804 tcp flags == 0x12 tcp window 65535 
+trace id 56c0a46f inet mangle FORWARD verdict continue 
+trace id 56c0a46f inet mangle FORWARD policy accept 
+trace id 56c0a46f ip vyos_filter VYOS_FORWARD_filter packet: iif "eth0" oif "eth1" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 192.168.0.50 ip dscp cs3 ip ecn not-ect ip ttl 122 ip id 0 ip length 60 tcp sport 80 tcp dport 40804 tcp flags == 0x12 tcp window 65535 
+trace id 56c0a46f ip vyos_filter VYOS_FORWARD_filter rule counter packets 172 bytes 15672 accept comment "FWD-filter default-action accept" (verdict accept)
+trace id 56c0a46f ip raw VYOS_TCP_MSS packet: iif "eth0" oif "eth1" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 192.168.0.50 ip dscp cs3 ip ecn not-ect ip ttl 122 ip id 0 ip length 60 tcp sport 80 tcp dport 40804 tcp flags == 0x12 tcp window 65535 
+trace id 56c0a46f ip raw VYOS_TCP_MSS verdict continue 
+trace id 56c0a46f ip raw VYOS_TCP_MSS policy accept 
+trace id 6af521c6 inet trace prerouting packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47875 ip protocol tcp ip length 52 tcp sport 40804 tcp dport 80 tcp flags == ack tcp window 502 
+trace id 6af521c6 inet trace prerouting rule ip protocol tcp meta nftrace set 1 (verdict continue)
+trace id 6af521c6 inet trace prerouting verdict continue 
+trace id 6af521c6 inet trace prerouting policy accept 
+trace id 6af521c6 ip vyos_conntrack PREROUTING packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47875 ip length 52 tcp sport 40804 tcp dport 80 tcp flags == ack tcp window 502 
+trace id 6af521c6 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump VYOS_CT_IGNORE (verdict jump VYOS_CT_IGNORE)
+trace id 6af521c6 ip vyos_conntrack VYOS_CT_IGNORE verdict return 
+trace id 6af521c6 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump FW_CONNTRACK (verdict jump FW_CONNTRACK)
+trace id 6af521c6 ip vyos_conntrack FW_CONNTRACK verdict return 
+trace id 6af521c6 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump NAT_CONNTRACK (verdict jump NAT_CONNTRACK)
+trace id 6af521c6 ip vyos_conntrack NAT_CONNTRACK rule accept (verdict accept)
+trace id 6af521c6 ip vyos_filter VYOS_PREROUTING_raw packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47875 ip length 52 tcp sport 40804 tcp dport 80 tcp flags == ack tcp window 502 
+trace id 6af521c6 ip vyos_filter VYOS_PREROUTING_raw rule counter packets 1744 bytes 158911 accept comment "PRE-raw default-action accept" (verdict accept)
+trace id 6af521c6 inet vrf_zones vrf_zones_ct_in packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47875 ip protocol tcp ip length 52 tcp sport 40804 tcp dport 80 tcp flags == ack tcp window 502 
+trace id 6af521c6 inet vrf_zones vrf_zones_ct_in verdict continue 
+trace id 6af521c6 inet vrf_zones vrf_zones_ct_in policy accept 
+trace id 6af521c6 ip raw VYOS_PREROUTING_HOOK packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47875 ip length 52 tcp sport 40804 tcp dport 80 tcp flags == ack tcp window 502 
+trace id 6af521c6 ip raw VYOS_PREROUTING_HOOK verdict continue 
+trace id 6af521c6 ip raw VYOS_PREROUTING_HOOK policy accept 
+trace id 6af521c6 ip raw vyos_rpfilter packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47875 ip length 52 tcp sport 40804 tcp dport 80 tcp flags == ack tcp window 502 
+trace id 6af521c6 ip raw vyos_rpfilter rule counter packets 2151 bytes 191831 jump vyos_global_rpfilter (verdict jump vyos_global_rpfilter)
+trace id 6af521c6 ip raw vyos_global_rpfilter verdict return 
+trace id 6af521c6 ip raw vyos_rpfilter verdict continue 
+trace id 6af521c6 ip raw vyos_rpfilter policy accept 
+trace id 6af521c6 ip vyos_conntrack PREROUTING_HELPER packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47875 ip length 52 tcp sport 40804 tcp dport 80 tcp flags == ack tcp window 502 
+trace id 6af521c6 ip vyos_conntrack PREROUTING_HELPER rule counter packets 1744 bytes 158911 jump VYOS_CT_HELPER (verdict jump VYOS_CT_HELPER)
+trace id 6af521c6 ip vyos_conntrack VYOS_CT_HELPER verdict return 
+trace id 6af521c6 ip vyos_conntrack PREROUTING_HELPER verdict continue 
+trace id 6af521c6 ip vyos_conntrack PREROUTING_HELPER policy accept 
+trace id c2f5f68d inet trace prerouting packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47876 ip protocol tcp ip length 125 tcp sport 40804 tcp dport 80 tcp flags == 0x18 tcp window 502 
+trace id c2f5f68d inet trace prerouting rule ip protocol tcp meta nftrace set 1 (verdict continue)
+trace id c2f5f68d inet trace prerouting verdict continue 
+trace id c2f5f68d inet trace prerouting policy accept 
+trace id c2f5f68d ip vyos_conntrack PREROUTING packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47876 ip length 125 tcp sport 40804 tcp dport 80 tcp flags == 0x18 tcp window 502 
+trace id c2f5f68d ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump VYOS_CT_IGNORE (verdict jump VYOS_CT_IGNORE)
+trace id c2f5f68d ip vyos_conntrack VYOS_CT_IGNORE verdict return 
+trace id c2f5f68d ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump FW_CONNTRACK (verdict jump FW_CONNTRACK)
+trace id c2f5f68d ip vyos_conntrack FW_CONNTRACK verdict return 
+trace id c2f5f68d ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump NAT_CONNTRACK (verdict jump NAT_CONNTRACK)
+trace id c2f5f68d ip vyos_conntrack NAT_CONNTRACK rule accept (verdict accept)
+trace id c2f5f68d ip vyos_filter VYOS_PREROUTING_raw packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47876 ip length 125 tcp sport 40804 tcp dport 80 tcp flags == 0x18 tcp window 502 
+trace id c2f5f68d ip vyos_filter VYOS_PREROUTING_raw rule counter packets 1744 bytes 158911 accept comment "PRE-raw default-action accept" (verdict accept)
+trace id c2f5f68d inet vrf_zones vrf_zones_ct_in packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47876 ip protocol tcp ip length 125 tcp sport 40804 tcp dport 80 tcp flags == 0x18 tcp window 502 
+trace id c2f5f68d inet vrf_zones vrf_zones_ct_in verdict continue 
+trace id c2f5f68d inet vrf_zones vrf_zones_ct_in policy accept 
+trace id c2f5f68d ip raw VYOS_PREROUTING_HOOK packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47876 ip length 125 tcp sport 40804 tcp dport 80 tcp flags == 0x18 tcp window 502 
+trace id c2f5f68d ip raw VYOS_PREROUTING_HOOK verdict continue 
+trace id c2f5f68d ip raw VYOS_PREROUTING_HOOK policy accept 
+trace id c2f5f68d ip raw vyos_rpfilter packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47876 ip length 125 tcp sport 40804 tcp dport 80 tcp flags == 0x18 tcp window 502 
+trace id c2f5f68d ip raw vyos_rpfilter rule counter packets 2151 bytes 191831 jump vyos_global_rpfilter (verdict jump vyos_global_rpfilter)
+trace id c2f5f68d ip raw vyos_global_rpfilter verdict return 
+trace id c2f5f68d ip raw vyos_rpfilter verdict continue 
+trace id c2f5f68d ip raw vyos_rpfilter policy accept 
+trace id c2f5f68d ip vyos_conntrack PREROUTING_HELPER packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47876 ip length 125 tcp sport 40804 tcp dport 80 tcp flags == 0x18 tcp window 502 
+trace id c2f5f68d ip vyos_conntrack PREROUTING_HELPER rule counter packets 1744 bytes 158911 jump VYOS_CT_HELPER (verdict jump VYOS_CT_HELPER)
+trace id c2f5f68d ip vyos_conntrack VYOS_CT_HELPER verdict return 
+trace id c2f5f68d ip vyos_conntrack PREROUTING_HELPER verdict continue 
+trace id c2f5f68d ip vyos_conntrack PREROUTING_HELPER policy accept 
+trace id 6af521c6 inet mangle FORWARD packet: iif "eth1" oif "eth0" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 63 ip id 47875 ip protocol tcp ip length 52 tcp sport 40804 tcp dport 80 tcp flags == ack tcp window 502 
+trace id 6af521c6 inet mangle FORWARD verdict continue 
+trace id 6af521c6 inet mangle FORWARD policy accept 
+trace id 6af521c6 ip vyos_filter VYOS_FORWARD_filter packet: iif "eth1" oif "eth0" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 63 ip id 47875 ip length 52 tcp sport 40804 tcp dport 80 tcp flags == ack tcp window 502 
+trace id 6af521c6 ip vyos_filter VYOS_FORWARD_filter rule counter packets 172 bytes 15672 accept comment "FWD-filter default-action accept" (verdict accept)
+trace id 6af521c6 ip raw VYOS_TCP_MSS packet: iif "eth1" oif "eth0" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 63 ip id 47875 ip length 52 tcp sport 40804 tcp dport 80 tcp flags == ack tcp window 502 
+trace id 6af521c6 ip raw VYOS_TCP_MSS verdict continue 
+trace id 6af521c6 ip raw VYOS_TCP_MSS policy accept 
+trace id c2f5f68d inet mangle FORWARD packet: iif "eth1" oif "eth0" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 63 ip id 47876 ip protocol tcp ip length 125 tcp sport 40804 tcp dport 80 tcp flags == 0x18 tcp window 502 
+trace id c2f5f68d inet mangle FORWARD verdict continue 
+trace id c2f5f68d inet mangle FORWARD policy accept 
+trace id c2f5f68d ip vyos_filter VYOS_FORWARD_filter packet: iif "eth1" oif "eth0" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 63 ip id 47876 ip length 125 tcp sport 40804 tcp dport 80 tcp flags == 0x18 tcp window 502 
+trace id c2f5f68d ip vyos_filter VYOS_FORWARD_filter rule counter packets 172 bytes 15672 accept comment "FWD-filter default-action accept" (verdict accept)
+trace id c2f5f68d ip raw VYOS_TCP_MSS packet: iif "eth1" oif "eth0" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 63 ip id 47876 ip length 125 tcp sport 40804 tcp dport 80 tcp flags == 0x18 tcp window 502 
+trace id c2f5f68d ip raw VYOS_TCP_MSS verdict continue 
+trace id c2f5f68d ip raw VYOS_TCP_MSS policy accept 
+trace id 7ee2eefe inet trace prerouting packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 50474 ip protocol tcp ip length 52 tcp sport 80 tcp dport 40804 tcp flags == ack tcp window 1050 
+trace id 7ee2eefe inet trace prerouting rule ip protocol tcp meta nftrace set 1 (verdict continue)
+trace id 7ee2eefe inet trace prerouting verdict continue 
+trace id 7ee2eefe inet trace prerouting policy accept 
+trace id 7ee2eefe ip vyos_conntrack PREROUTING packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 50474 ip length 52 tcp sport 80 tcp dport 40804 tcp flags == ack tcp window 1050 
+trace id 7ee2eefe ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump VYOS_CT_IGNORE (verdict jump VYOS_CT_IGNORE)
+trace id 7ee2eefe ip vyos_conntrack VYOS_CT_IGNORE verdict return 
+trace id 7ee2eefe ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump FW_CONNTRACK (verdict jump FW_CONNTRACK)
+trace id 7ee2eefe ip vyos_conntrack FW_CONNTRACK verdict return 
+trace id 7ee2eefe ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump NAT_CONNTRACK (verdict jump NAT_CONNTRACK)
+trace id 7ee2eefe ip vyos_conntrack NAT_CONNTRACK rule accept (verdict accept)
+trace id 7ee2eefe ip vyos_filter VYOS_PREROUTING_raw packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 50474 ip length 52 tcp sport 80 tcp dport 40804 tcp flags == ack tcp window 1050 
+trace id 7ee2eefe ip vyos_filter VYOS_PREROUTING_raw rule counter packets 1744 bytes 158911 accept comment "PRE-raw default-action accept" (verdict accept)
+trace id 7ee2eefe inet vrf_zones vrf_zones_ct_in packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 50474 ip protocol tcp ip length 52 tcp sport 80 tcp dport 40804 tcp flags == ack tcp window 1050 
+trace id 7ee2eefe inet vrf_zones vrf_zones_ct_in verdict continue 
+trace id 7ee2eefe inet vrf_zones vrf_zones_ct_in policy accept 
+trace id 7ee2eefe ip raw VYOS_PREROUTING_HOOK packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 50474 ip length 52 tcp sport 80 tcp dport 40804 tcp flags == ack tcp window 1050 
+trace id 7ee2eefe ip raw VYOS_PREROUTING_HOOK verdict continue 
+trace id 7ee2eefe ip raw VYOS_PREROUTING_HOOK policy accept 
+trace id 7ee2eefe ip raw vyos_rpfilter packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 50474 ip length 52 tcp sport 80 tcp dport 40804 tcp flags == ack tcp window 1050 
+trace id 7ee2eefe ip raw vyos_rpfilter rule counter packets 2151 bytes 191831 jump vyos_global_rpfilter (verdict jump vyos_global_rpfilter)
+trace id 7ee2eefe ip raw vyos_global_rpfilter verdict return 
+trace id 7ee2eefe ip raw vyos_rpfilter verdict continue 
+trace id 7ee2eefe ip raw vyos_rpfilter policy accept 
+trace id 7ee2eefe ip vyos_conntrack PREROUTING_HELPER packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 192.168.0.50 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 50474 ip length 52 tcp sport 80 tcp dport 40804 tcp flags == ack tcp window 1050 
+trace id 7ee2eefe ip vyos_conntrack PREROUTING_HELPER rule counter packets 1744 bytes 158911 jump VYOS_CT_HELPER (verdict jump VYOS_CT_HELPER)
+trace id 7ee2eefe ip vyos_conntrack VYOS_CT_HELPER verdict return 
+trace id 7ee2eefe ip vyos_conntrack PREROUTING_HELPER verdict continue 
+trace id 7ee2eefe ip vyos_conntrack PREROUTING_HELPER policy accept 
+trace id 7ee2eefe inet mangle FORWARD packet: iif "eth0" oif "eth1" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 192.168.0.50 ip dscp cs3 ip ecn not-ect ip ttl 122 ip id 50474 ip protocol tcp ip length 52 tcp sport 80 tcp dport 40804 tcp flags == ack tcp window 1050 
+trace id 7ee2eefe inet mangle FORWARD verdict continue 
+trace id 7ee2eefe inet mangle FORWARD policy accept 
+trace id 7ee2eefe ip vyos_filter VYOS_FORWARD_filter packet: iif "eth0" oif "eth1" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 192.168.0.50 ip dscp cs3 ip ecn not-ect ip ttl 122 ip id 50474 ip length 52 tcp sport 80 tcp dport 40804 tcp flags == ack tcp window 1050 
+trace id 7ee2eefe ip vyos_filter VYOS_FORWARD_filter rule counter packets 172 bytes 15672 accept comment "FWD-filter default-action accept" (verdict accept)
+trace id 7ee2eefe ip raw VYOS_TCP_MSS packet: iif "eth0" oif "eth1" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 192.168.0.50 ip dscp cs3 ip ecn not-ect ip ttl 122 ip id 50474 ip length 52 tcp sport 80 tcp dport 40804 tcp flags == ack tcp window 1050 
+trace id 7ee2eefe ip raw VYOS_TCP_MSS verdict continue 
+trace id 7ee2eefe ip raw VYOS_TCP_MSS policy accept 
+trace id 56c0a46f inet trace prerouting packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 50475 ip protocol tcp ip length 694 tcp sport 80 tcp dport 40804 tcp flags == 0x18 tcp window 1050 
+trace id 56c0a46f inet trace prerouting rule ip protocol tcp meta nftrace set 1 (verdict continue)
+trace id 56c0a46f inet trace prerouting verdict continue 
+trace id 56c0a46f inet trace prerouting policy accept 
+trace id 56c0a46f ip vyos_conntrack PREROUTING packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 50475 ip length 694 tcp sport 80 tcp dport 40804 tcp flags == 0x18 tcp window 1050 
+trace id 56c0a46f ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump VYOS_CT_IGNORE (verdict jump VYOS_CT_IGNORE)
+trace id 56c0a46f ip vyos_conntrack VYOS_CT_IGNORE verdict return 
+trace id 56c0a46f ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump FW_CONNTRACK (verdict jump FW_CONNTRACK)
+trace id 56c0a46f ip vyos_conntrack FW_CONNTRACK verdict return 
+trace id 56c0a46f ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump NAT_CONNTRACK (verdict jump NAT_CONNTRACK)
+trace id 56c0a46f ip vyos_conntrack NAT_CONNTRACK rule accept (verdict accept)
+trace id 56c0a46f ip vyos_filter VYOS_PREROUTING_raw packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 50475 ip length 694 tcp sport 80 tcp dport 40804 tcp flags == 0x18 tcp window 1050 
+trace id 56c0a46f ip vyos_filter VYOS_PREROUTING_raw rule counter packets 1744 bytes 158911 accept comment "PRE-raw default-action accept" (verdict accept)
+trace id 56c0a46f inet vrf_zones vrf_zones_ct_in packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 50475 ip protocol tcp ip length 694 tcp sport 80 tcp dport 40804 tcp flags == 0x18 tcp window 1050 
+trace id 56c0a46f inet vrf_zones vrf_zones_ct_in verdict continue 
+trace id 56c0a46f inet vrf_zones vrf_zones_ct_in policy accept 
+trace id 56c0a46f ip raw VYOS_PREROUTING_HOOK packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 50475 ip length 694 tcp sport 80 tcp dport 40804 tcp flags == 0x18 tcp window 1050 
+trace id 56c0a46f ip raw VYOS_PREROUTING_HOOK verdict continue 
+trace id 56c0a46f ip raw VYOS_PREROUTING_HOOK policy accept 
+trace id 56c0a46f ip raw vyos_rpfilter packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 50475 ip length 694 tcp sport 80 tcp dport 40804 tcp flags == 0x18 tcp window 1050 
+trace id 56c0a46f ip raw vyos_rpfilter rule counter packets 2151 bytes 191831 jump vyos_global_rpfilter (verdict jump vyos_global_rpfilter)
+trace id 56c0a46f ip raw vyos_global_rpfilter verdict return 
+trace id 56c0a46f ip raw vyos_rpfilter verdict continue 
+trace id 56c0a46f ip raw vyos_rpfilter policy accept 
+trace id 56c0a46f ip vyos_conntrack PREROUTING_HELPER packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 192.168.0.50 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 50475 ip length 694 tcp sport 80 tcp dport 40804 tcp flags == 0x18 tcp window 1050 
+trace id 56c0a46f ip vyos_conntrack PREROUTING_HELPER rule counter packets 1744 bytes 158911 jump VYOS_CT_HELPER (verdict jump VYOS_CT_HELPER)
+trace id 56c0a46f ip vyos_conntrack VYOS_CT_HELPER verdict return 
+trace id 56c0a46f ip vyos_conntrack PREROUTING_HELPER verdict continue 
+trace id 56c0a46f ip vyos_conntrack PREROUTING_HELPER policy accept 
+trace id 56c0a46f inet mangle FORWARD packet: iif "eth0" oif "eth1" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 192.168.0.50 ip dscp cs3 ip ecn not-ect ip ttl 122 ip id 50475 ip protocol tcp ip length 694 tcp sport 80 tcp dport 40804 tcp flags == 0x18 tcp window 1050 
+trace id 56c0a46f inet mangle FORWARD verdict continue 
+trace id 56c0a46f inet mangle FORWARD policy accept 
+trace id 56c0a46f ip vyos_filter VYOS_FORWARD_filter packet: iif "eth0" oif "eth1" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 192.168.0.50 ip dscp cs3 ip ecn not-ect ip ttl 122 ip id 50475 ip length 694 tcp sport 80 tcp dport 40804 tcp flags == 0x18 tcp window 1050 
+trace id 56c0a46f ip vyos_filter VYOS_FORWARD_filter rule counter packets 172 bytes 15672 accept comment "FWD-filter default-action accept" (verdict accept)
+trace id 56c0a46f ip raw VYOS_TCP_MSS packet: iif "eth0" oif "eth1" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 192.168.0.50 ip dscp cs3 ip ecn not-ect ip ttl 122 ip id 50475 ip length 694 tcp sport 80 tcp dport 40804 tcp flags == 0x18 tcp window 1050 
+trace id 56c0a46f ip raw VYOS_TCP_MSS verdict continue 
+trace id 56c0a46f ip raw VYOS_TCP_MSS policy accept 
+trace id 6af521c6 inet trace prerouting packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47877 ip protocol tcp ip length 52 tcp sport 40804 tcp dport 80 tcp flags == ack tcp window 497 
+trace id 6af521c6 inet trace prerouting rule ip protocol tcp meta nftrace set 1 (verdict continue)
+trace id 6af521c6 inet trace prerouting verdict continue 
+trace id 6af521c6 inet trace prerouting policy accept 
+trace id 6af521c6 ip vyos_conntrack PREROUTING packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47877 ip length 52 tcp sport 40804 tcp dport 80 tcp flags == ack tcp window 497 
+trace id 6af521c6 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump VYOS_CT_IGNORE (verdict jump VYOS_CT_IGNORE)
+trace id 6af521c6 ip vyos_conntrack VYOS_CT_IGNORE verdict return 
+trace id 6af521c6 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump FW_CONNTRACK (verdict jump FW_CONNTRACK)
+trace id 6af521c6 ip vyos_conntrack FW_CONNTRACK verdict return 
+trace id 6af521c6 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump NAT_CONNTRACK (verdict jump NAT_CONNTRACK)
+trace id 6af521c6 ip vyos_conntrack NAT_CONNTRACK rule accept (verdict accept)
+trace id 6af521c6 ip vyos_filter VYOS_PREROUTING_raw packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47877 ip length 52 tcp sport 40804 tcp dport 80 tcp flags == ack tcp window 497 
+trace id 6af521c6 ip vyos_filter VYOS_PREROUTING_raw rule counter packets 1744 bytes 158911 accept comment "PRE-raw default-action accept" (verdict accept)
+trace id 6af521c6 inet vrf_zones vrf_zones_ct_in packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47877 ip protocol tcp ip length 52 tcp sport 40804 tcp dport 80 tcp flags == ack tcp window 497 
+trace id 6af521c6 inet vrf_zones vrf_zones_ct_in verdict continue 
+trace id 6af521c6 inet vrf_zones vrf_zones_ct_in policy accept 
+trace id 6af521c6 ip raw VYOS_PREROUTING_HOOK packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47877 ip length 52 tcp sport 40804 tcp dport 80 tcp flags == ack tcp window 497 
+trace id 6af521c6 ip raw VYOS_PREROUTING_HOOK verdict continue 
+trace id 6af521c6 ip raw VYOS_PREROUTING_HOOK policy accept 
+trace id 6af521c6 ip raw vyos_rpfilter packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47877 ip length 52 tcp sport 40804 tcp dport 80 tcp flags == ack tcp window 497 
+trace id 6af521c6 ip raw vyos_rpfilter rule counter packets 2151 bytes 191831 jump vyos_global_rpfilter (verdict jump vyos_global_rpfilter)
+trace id 6af521c6 ip raw vyos_global_rpfilter verdict return 
+trace id 6af521c6 ip raw vyos_rpfilter verdict continue 
+trace id 6af521c6 ip raw vyos_rpfilter policy accept 
+trace id 6af521c6 ip vyos_conntrack PREROUTING_HELPER packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47877 ip length 52 tcp sport 40804 tcp dport 80 tcp flags == ack tcp window 497 
+trace id 6af521c6 ip vyos_conntrack PREROUTING_HELPER rule counter packets 1744 bytes 158911 jump VYOS_CT_HELPER (verdict jump VYOS_CT_HELPER)
+trace id 6af521c6 ip vyos_conntrack VYOS_CT_HELPER verdict return 
+trace id 6af521c6 ip vyos_conntrack PREROUTING_HELPER verdict continue 
+trace id 6af521c6 ip vyos_conntrack PREROUTING_HELPER policy accept 
+trace id 6af521c6 inet mangle FORWARD packet: iif "eth1" oif "eth0" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 63 ip id 47877 ip protocol tcp ip length 52 tcp sport 40804 tcp dport 80 tcp flags == ack tcp window 497 
+trace id 6af521c6 inet mangle FORWARD verdict continue 
+trace id 6af521c6 inet mangle FORWARD policy accept 
+trace id 6af521c6 ip vyos_filter VYOS_FORWARD_filter packet: iif "eth1" oif "eth0" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 63 ip id 47877 ip length 52 tcp sport 40804 tcp dport 80 tcp flags == ack tcp window 497 
+trace id 6af521c6 ip vyos_filter VYOS_FORWARD_filter rule counter packets 172 bytes 15672 accept comment "FWD-filter default-action accept" (verdict accept)
+trace id 6af521c6 ip raw VYOS_TCP_MSS packet: iif "eth1" oif "eth0" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 63 ip id 47877 ip length 52 tcp sport 40804 tcp dport 80 tcp flags == ack tcp window 497 
+trace id 6af521c6 ip raw VYOS_TCP_MSS verdict continue 
+trace id 6af521c6 ip raw VYOS_TCP_MSS policy accept 
+trace id c2f5f68d inet trace prerouting packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47878 ip protocol tcp ip length 52 tcp sport 40804 tcp dport 80 tcp flags == 0x11 tcp window 497 
+trace id c2f5f68d inet trace prerouting rule ip protocol tcp meta nftrace set 1 (verdict continue)
+trace id c2f5f68d inet trace prerouting verdict continue 
+trace id c2f5f68d inet trace prerouting policy accept 
+trace id c2f5f68d ip vyos_conntrack PREROUTING packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47878 ip length 52 tcp sport 40804 tcp dport 80 tcp flags == 0x11 tcp window 497 
+trace id c2f5f68d ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump VYOS_CT_IGNORE (verdict jump VYOS_CT_IGNORE)
+trace id c2f5f68d ip vyos_conntrack VYOS_CT_IGNORE verdict return 
+trace id c2f5f68d ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump FW_CONNTRACK (verdict jump FW_CONNTRACK)
+trace id c2f5f68d ip vyos_conntrack FW_CONNTRACK verdict return 
+trace id c2f5f68d ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump NAT_CONNTRACK (verdict jump NAT_CONNTRACK)
+trace id c2f5f68d ip vyos_conntrack NAT_CONNTRACK rule accept (verdict accept)
+trace id c2f5f68d ip vyos_filter VYOS_PREROUTING_raw packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47878 ip length 52 tcp sport 40804 tcp dport 80 tcp flags == 0x11 tcp window 497 
+trace id c2f5f68d ip vyos_filter VYOS_PREROUTING_raw rule counter packets 1744 bytes 158911 accept comment "PRE-raw default-action accept" (verdict accept)
+trace id c2f5f68d inet vrf_zones vrf_zones_ct_in packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47878 ip protocol tcp ip length 52 tcp sport 40804 tcp dport 80 tcp flags == 0x11 tcp window 497 
+trace id c2f5f68d inet vrf_zones vrf_zones_ct_in verdict continue 
+trace id c2f5f68d inet vrf_zones vrf_zones_ct_in policy accept 
+trace id c2f5f68d ip raw VYOS_PREROUTING_HOOK packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47878 ip length 52 tcp sport 40804 tcp dport 80 tcp flags == 0x11 tcp window 497 
+trace id c2f5f68d ip raw VYOS_PREROUTING_HOOK verdict continue 
+trace id c2f5f68d ip raw VYOS_PREROUTING_HOOK policy accept 
+trace id c2f5f68d ip raw vyos_rpfilter packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47878 ip length 52 tcp sport 40804 tcp dport 80 tcp flags == 0x11 tcp window 497 
+trace id c2f5f68d ip raw vyos_rpfilter rule counter packets 2151 bytes 191831 jump vyos_global_rpfilter (verdict jump vyos_global_rpfilter)
+trace id c2f5f68d ip raw vyos_global_rpfilter verdict return 
+trace id c2f5f68d ip raw vyos_rpfilter verdict continue 
+trace id c2f5f68d ip raw vyos_rpfilter policy accept 
+trace id c2f5f68d ip vyos_conntrack PREROUTING_HELPER packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47878 ip length 52 tcp sport 40804 tcp dport 80 tcp flags == 0x11 tcp window 497 
+trace id c2f5f68d ip vyos_conntrack PREROUTING_HELPER rule counter packets 1744 bytes 158911 jump VYOS_CT_HELPER (verdict jump VYOS_CT_HELPER)
+trace id c2f5f68d ip vyos_conntrack VYOS_CT_HELPER verdict return 
+trace id c2f5f68d ip vyos_conntrack PREROUTING_HELPER verdict continue 
+trace id c2f5f68d ip vyos_conntrack PREROUTING_HELPER policy accept 
+trace id c2f5f68d inet mangle FORWARD packet: iif "eth1" oif "eth0" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 63 ip id 47878 ip protocol tcp ip length 52 tcp sport 40804 tcp dport 80 tcp flags == 0x11 tcp window 497 
+trace id c2f5f68d inet mangle FORWARD verdict continue 
+trace id c2f5f68d inet mangle FORWARD policy accept 
+trace id c2f5f68d ip vyos_filter VYOS_FORWARD_filter packet: iif "eth1" oif "eth0" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 63 ip id 47878 ip length 52 tcp sport 40804 tcp dport 80 tcp flags == 0x11 tcp window 497 
+trace id c2f5f68d ip vyos_filter VYOS_FORWARD_filter rule counter packets 172 bytes 15672 accept comment "FWD-filter default-action accept" (verdict accept)
+trace id c2f5f68d ip raw VYOS_TCP_MSS packet: iif "eth1" oif "eth0" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 63 ip id 47878 ip length 52 tcp sport 40804 tcp dport 80 tcp flags == 0x11 tcp window 497 
+trace id c2f5f68d ip raw VYOS_TCP_MSS verdict continue 
+trace id c2f5f68d ip raw VYOS_TCP_MSS policy accept 
+trace id 7ee2eefe inet trace prerouting packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 50476 ip protocol tcp ip length 52 tcp sport 80 tcp dport 40804 tcp flags == 0x11 tcp window 1050 
+trace id 7ee2eefe inet trace prerouting rule ip protocol tcp meta nftrace set 1 (verdict continue)
+trace id 7ee2eefe inet trace prerouting verdict continue 
+trace id 7ee2eefe inet trace prerouting policy accept 
+trace id 7ee2eefe ip vyos_conntrack PREROUTING packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 50476 ip length 52 tcp sport 80 tcp dport 40804 tcp flags == 0x11 tcp window 1050 
+trace id 7ee2eefe ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump VYOS_CT_IGNORE (verdict jump VYOS_CT_IGNORE)
+trace id 7ee2eefe ip vyos_conntrack VYOS_CT_IGNORE verdict return 
+trace id 7ee2eefe ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump FW_CONNTRACK (verdict jump FW_CONNTRACK)
+trace id 7ee2eefe ip vyos_conntrack FW_CONNTRACK verdict return 
+trace id 7ee2eefe ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump NAT_CONNTRACK (verdict jump NAT_CONNTRACK)
+trace id 7ee2eefe ip vyos_conntrack NAT_CONNTRACK rule accept (verdict accept)
+trace id 7ee2eefe ip vyos_filter VYOS_PREROUTING_raw packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 50476 ip length 52 tcp sport 80 tcp dport 40804 tcp flags == 0x11 tcp window 1050 
+trace id 7ee2eefe ip vyos_filter VYOS_PREROUTING_raw rule counter packets 1744 bytes 158911 accept comment "PRE-raw default-action accept" (verdict accept)
+trace id 7ee2eefe inet vrf_zones vrf_zones_ct_in packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 50476 ip protocol tcp ip length 52 tcp sport 80 tcp dport 40804 tcp flags == 0x11 tcp window 1050 
+trace id 7ee2eefe inet vrf_zones vrf_zones_ct_in verdict continue 
+trace id 7ee2eefe inet vrf_zones vrf_zones_ct_in policy accept 
+trace id 7ee2eefe ip raw VYOS_PREROUTING_HOOK packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 50476 ip length 52 tcp sport 80 tcp dport 40804 tcp flags == 0x11 tcp window 1050 
+trace id 7ee2eefe ip raw VYOS_PREROUTING_HOOK verdict continue 
+trace id 7ee2eefe ip raw VYOS_PREROUTING_HOOK policy accept 
+trace id 7ee2eefe ip raw vyos_rpfilter packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 10.0.101.214 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 50476 ip length 52 tcp sport 80 tcp dport 40804 tcp flags == 0x11 tcp window 1050 
+trace id 7ee2eefe ip raw vyos_rpfilter rule counter packets 2151 bytes 191831 jump vyos_global_rpfilter (verdict jump vyos_global_rpfilter)
+trace id 7ee2eefe ip raw vyos_global_rpfilter verdict return 
+trace id 7ee2eefe ip raw vyos_rpfilter verdict continue 
+trace id 7ee2eefe ip raw vyos_rpfilter policy accept 
+trace id 7ee2eefe ip vyos_conntrack PREROUTING_HELPER packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 192.168.0.50 ip dscp cs3 ip ecn not-ect ip ttl 123 ip id 50476 ip length 52 tcp sport 80 tcp dport 40804 tcp flags == 0x11 tcp window 1050 
+trace id 7ee2eefe ip vyos_conntrack PREROUTING_HELPER rule counter packets 1744 bytes 158911 jump VYOS_CT_HELPER (verdict jump VYOS_CT_HELPER)
+trace id 7ee2eefe ip vyos_conntrack VYOS_CT_HELPER verdict return 
+trace id 7ee2eefe ip vyos_conntrack PREROUTING_HELPER verdict continue 
+trace id 7ee2eefe ip vyos_conntrack PREROUTING_HELPER policy accept 
+trace id 7ee2eefe inet mangle FORWARD packet: iif "eth0" oif "eth1" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 192.168.0.50 ip dscp cs3 ip ecn not-ect ip ttl 122 ip id 50476 ip protocol tcp ip length 52 tcp sport 80 tcp dport 40804 tcp flags == 0x11 tcp window 1050 
+trace id 7ee2eefe inet mangle FORWARD verdict continue 
+trace id 7ee2eefe inet mangle FORWARD policy accept 
+trace id 7ee2eefe ip vyos_filter VYOS_FORWARD_filter packet: iif "eth0" oif "eth1" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 192.168.0.50 ip dscp cs3 ip ecn not-ect ip ttl 122 ip id 50476 ip length 52 tcp sport 80 tcp dport 40804 tcp flags == 0x11 tcp window 1050 
+trace id 7ee2eefe ip vyos_filter VYOS_FORWARD_filter rule counter packets 172 bytes 15672 accept comment "FWD-filter default-action accept" (verdict accept)
+trace id 7ee2eefe ip raw VYOS_TCP_MSS packet: iif "eth0" oif "eth1" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 34.117.59.81 ip daddr 192.168.0.50 ip dscp cs3 ip ecn not-ect ip ttl 122 ip id 50476 ip length 52 tcp sport 80 tcp dport 40804 tcp flags == 0x11 tcp window 1050 
+trace id 7ee2eefe ip raw VYOS_TCP_MSS verdict continue 
+trace id 7ee2eefe ip raw VYOS_TCP_MSS policy accept 
+trace id c2f5f68d inet trace prerouting packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47879 ip protocol tcp ip length 52 tcp sport 40804 tcp dport 80 tcp flags == ack tcp window 497 
+trace id c2f5f68d inet trace prerouting rule ip protocol tcp meta nftrace set 1 (verdict continue)
+trace id c2f5f68d inet trace prerouting verdict continue 
+trace id c2f5f68d inet trace prerouting policy accept 
+trace id c2f5f68d ip vyos_conntrack PREROUTING packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47879 ip length 52 tcp sport 40804 tcp dport 80 tcp flags == ack tcp window 497 
+trace id c2f5f68d ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump VYOS_CT_IGNORE (verdict jump VYOS_CT_IGNORE)
+trace id c2f5f68d ip vyos_conntrack VYOS_CT_IGNORE verdict return 
+trace id c2f5f68d ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump FW_CONNTRACK (verdict jump FW_CONNTRACK)
+trace id c2f5f68d ip vyos_conntrack FW_CONNTRACK verdict return 
+trace id c2f5f68d ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump NAT_CONNTRACK (verdict jump NAT_CONNTRACK)
+trace id c2f5f68d ip vyos_conntrack NAT_CONNTRACK rule accept (verdict accept)
+trace id c2f5f68d ip vyos_filter VYOS_PREROUTING_raw packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47879 ip length 52 tcp sport 40804 tcp dport 80 tcp flags == ack tcp window 497 
+trace id c2f5f68d ip vyos_filter VYOS_PREROUTING_raw rule counter packets 1744 bytes 158911 accept comment "PRE-raw default-action accept" (verdict accept)
+trace id c2f5f68d inet vrf_zones vrf_zones_ct_in packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47879 ip protocol tcp ip length 52 tcp sport 40804 tcp dport 80 tcp flags == ack tcp window 497 
+trace id c2f5f68d inet vrf_zones vrf_zones_ct_in verdict continue 
+trace id c2f5f68d inet vrf_zones vrf_zones_ct_in policy accept 
+trace id c2f5f68d ip raw VYOS_PREROUTING_HOOK packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47879 ip length 52 tcp sport 40804 tcp dport 80 tcp flags == ack tcp window 497 
+trace id c2f5f68d ip raw VYOS_PREROUTING_HOOK verdict continue 
+trace id c2f5f68d ip raw VYOS_PREROUTING_HOOK policy accept 
+trace id c2f5f68d ip raw vyos_rpfilter packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47879 ip length 52 tcp sport 40804 tcp dport 80 tcp flags == ack tcp window 497 
+trace id c2f5f68d ip raw vyos_rpfilter rule counter packets 2151 bytes 191831 jump vyos_global_rpfilter (verdict jump vyos_global_rpfilter)
+trace id c2f5f68d ip raw vyos_global_rpfilter verdict return 
+trace id c2f5f68d ip raw vyos_rpfilter verdict continue 
+trace id c2f5f68d ip raw vyos_rpfilter policy accept 
+trace id c2f5f68d ip vyos_conntrack PREROUTING_HELPER packet: iif "eth1" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 64 ip id 47879 ip length 52 tcp sport 40804 tcp dport 80 tcp flags == ack tcp window 497 
+trace id c2f5f68d ip vyos_conntrack PREROUTING_HELPER rule counter packets 1744 bytes 158911 jump VYOS_CT_HELPER (verdict jump VYOS_CT_HELPER)
+trace id c2f5f68d ip vyos_conntrack VYOS_CT_HELPER verdict return 
+trace id c2f5f68d ip vyos_conntrack PREROUTING_HELPER verdict continue 
+trace id c2f5f68d ip vyos_conntrack PREROUTING_HELPER policy accept 
+trace id c2f5f68d inet mangle FORWARD packet: iif "eth1" oif "eth0" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 63 ip id 47879 ip protocol tcp ip length 52 tcp sport 40804 tcp dport 80 tcp flags == ack tcp window 497 
+trace id c2f5f68d inet mangle FORWARD verdict continue 
+trace id c2f5f68d inet mangle FORWARD policy accept 
+trace id c2f5f68d ip vyos_filter VYOS_FORWARD_filter packet: iif "eth1" oif "eth0" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 63 ip id 47879 ip length 52 tcp sport 40804 tcp dport 80 tcp flags == ack tcp window 497 
+trace id c2f5f68d ip vyos_filter VYOS_FORWARD_filter rule counter packets 172 bytes 15672 accept comment "FWD-filter default-action accept" (verdict accept)
+trace id c2f5f68d ip raw VYOS_TCP_MSS packet: iif "eth1" oif "eth0" ether saddr 0c:cc:fa:eb:00:00 ether daddr 0c:8d:9a:bd:00:01 ip saddr 192.168.0.50 ip daddr 34.117.59.81 ip dscp cs0 ip ecn not-ect ip ttl 63 ip id 47879 ip length 52 tcp sport 40804 tcp dport 80 tcp flags == ack tcp window 497 
+trace id c2f5f68d ip raw VYOS_TCP_MSS verdict continue 
+trace id c2f5f68d ip raw VYOS_TCP_MSS policy accept 
+trace id c4c157f9 inet trace prerouting packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32809 ip protocol tcp ip length 104 tcp sport 29670 tcp dport 22 tcp flags == 0x18 tcp window 8209 
+trace id c4c157f9 inet trace prerouting rule ip protocol tcp meta nftrace set 1 (verdict continue)
+trace id c4c157f9 inet trace prerouting verdict continue 
+trace id c4c157f9 inet trace prerouting policy accept 
+trace id c4c157f9 ip vyos_conntrack PREROUTING packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32809 ip length 104 tcp sport 29670 tcp dport 22 tcp flags == 0x18 tcp window 8209 
+trace id c4c157f9 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump VYOS_CT_IGNORE (verdict jump VYOS_CT_IGNORE)
+trace id c4c157f9 ip vyos_conntrack VYOS_CT_IGNORE verdict return 
+trace id c4c157f9 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump FW_CONNTRACK (verdict jump FW_CONNTRACK)
+trace id c4c157f9 ip vyos_conntrack FW_CONNTRACK verdict return 
+trace id c4c157f9 ip vyos_conntrack PREROUTING rule counter packets 1744 bytes 158911 jump NAT_CONNTRACK (verdict jump NAT_CONNTRACK)
+trace id c4c157f9 ip vyos_conntrack NAT_CONNTRACK rule accept (verdict accept)
+trace id c4c157f9 ip vyos_filter VYOS_PREROUTING_raw packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32809 ip length 104 tcp sport 29670 tcp dport 22 tcp flags == 0x18 tcp window 8209 
+trace id c4c157f9 ip vyos_filter VYOS_PREROUTING_raw rule counter packets 1744 bytes 158911 accept comment "PRE-raw default-action accept" (verdict accept)
+trace id c4c157f9 inet vrf_zones vrf_zones_ct_in packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32809 ip protocol tcp ip length 104 tcp sport 29670 tcp dport 22 tcp flags == 0x18 tcp window 8209 
+trace id c4c157f9 inet vrf_zones vrf_zones_ct_in verdict continue 
+trace id c4c157f9 inet vrf_zones vrf_zones_ct_in policy accept 
+trace id c4c157f9 ip raw VYOS_PREROUTING_HOOK packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32809 ip length 104 tcp sport 29670 tcp dport 22 tcp flags == 0x18 tcp window 8209 
+trace id c4c157f9 ip raw VYOS_PREROUTING_HOOK verdict continue 
+trace id c4c157f9 ip raw VYOS_PREROUTING_HOOK policy accept 
+trace id c4c157f9 ip raw vyos_rpfilter packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32809 ip length 104 tcp sport 29670 tcp dport 22 tcp flags == 0x18 tcp window 8209 
+trace id c4c157f9 ip raw vyos_rpfilter rule counter packets 2151 bytes 191831 jump vyos_global_rpfilter (verdict jump vyos_global_rpfilter)
+trace id c4c157f9 ip raw vyos_global_rpfilter verdict return 
+trace id c4c157f9 ip raw vyos_rpfilter verdict continue 
+trace id c4c157f9 ip raw vyos_rpfilter policy accept 
+trace id c4c157f9 ip vyos_conntrack PREROUTING_HELPER packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32809 ip length 104 tcp sport 29670 tcp dport 22 tcp flags == 0x18 tcp window 8209 
+trace id c4c157f9 ip vyos_conntrack PREROUTING_HELPER rule counter packets 1744 bytes 158911 jump VYOS_CT_HELPER (verdict jump VYOS_CT_HELPER)
+trace id c4c157f9 ip vyos_conntrack VYOS_CT_HELPER verdict return 
+trace id c4c157f9 ip vyos_conntrack PREROUTING_HELPER verdict continue 
+trace id c4c157f9 ip vyos_conntrack PREROUTING_HELPER policy accept 
+trace id c4c157f9 ip vyos_filter VYOS_INPUT_filter packet: iif "eth0" ether saddr 64:9d:99:d2:08:53 ether daddr 0c:8d:9a:bd:00:00 ip saddr 192.168.2.21 ip daddr 10.0.101.214 ip dscp cs0 ip ecn not-ect ip ttl 127 ip id 32809 ip length 104 tcp sport 29670 tcp dport 22 tcp flags == 0x18 tcp window 8209 
+trace id c4c157f9 ip vyos_filter VYOS_INPUT_filter rule counter packets 1572 bytes 143239 accept comment "INP-filter default-action accept" (verdict accept)
