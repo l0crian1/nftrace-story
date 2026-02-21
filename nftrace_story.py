@@ -231,7 +231,9 @@ def _format_event_short(e: TraceEvent) -> str:
     return " | ".join(parts)
 
 
-def story_for_trace(events: List[TraceEvent], *, markdown: bool = False) -> str:
+def story_for_trace(
+    events: List[TraceEvent], *, markdown: bool = False, include_timeline: bool = True
+) -> str:
     """
     Produce a story for a single trace id.
     """
@@ -259,10 +261,19 @@ def story_for_trace(events: List[TraceEvent], *, markdown: bool = False) -> str:
             ttl_changes.append((e.line_no, prev_ttl, ttl))
         prev_ttl = ttl
 
-    tables = []
+    table_order: List[str] = []
+    table_chains: dict[str, List[str]] = {}
     for e in events:
-        if e.table != "?" and e.table not in tables:
-            tables.append(e.table)
+        t = e.table
+        if t == "?":
+            continue
+        if t not in table_chains:
+            table_chains[t] = []
+            table_order.append(t)
+
+        c = e.chain
+        if c != "?" and c not in table_chains[t]:
+            table_chains[t].append(c)
 
     # Verdict / disposition (accept/drop/reject) and NAT-ish flow changes.
     disposition_re = re.compile(
@@ -306,31 +317,40 @@ def story_for_trace(events: List[TraceEvent], *, markdown: bool = False) -> str:
                 break
         prev_pt = pt
 
-    def _narrative_lines() -> List[str]:
+    def _story_lines(*, as_markdown: bool) -> List[str]:
+        """
+        Pre-formatted lines for the Story section.
+
+        - Markdown mode returns proper markdown bullets (including nested bullets).
+        - Text mode returns "- " / "  - " bullets; the caller can indent if desired.
+        """
+        top = "- " if as_markdown else "- "
+        sub = "  - " if as_markdown else "  - "
+
         lines: List[str] = []
         subject = flow or "Packet"
         if iif0:
-            lines.append(f'{subject} arrived on interface "{iif0}".')
+            lines.append(f'{top}{subject} arrived on interface "{iif0}".')
         else:
-            lines.append(f"{subject} appeared in nftrace output.")
+            lines.append(f"{top}{subject} appeared in nftrace output.")
 
         if oif_first:
-            lines.append(f'Routing selected egress interface "{oif_first}" (forwarding path).')
+            lines.append(f'{top}Routing selected egress interface "{oif_first}" (forwarding path).')
 
         # Most common forwarding signature is TTL decrement by 1.
         for ln, a, b in ttl_changes:
             if a - b == 1:
-                lines.append(f"TTL was decremented by 1 at L{ln} (typical for forwarding).")
+                lines.append(f"{top}TTL was decremented by 1 at L{ln} (typical for forwarding).")
                 break
 
         if last_hook:
-            lines.append(f"It was last observed near the {last_hook} hook (L{last.line_no}).")
+            lines.append(f"{top}It was last observed near the {last_hook} hook (L{last.line_no}).")
         else:
-            lines.append(f"It was last observed at L{last.line_no}.")
+            lines.append(f"{top}It was last observed at L{last.line_no}.")
 
         if final_disposition:
             ln, verdict = final_disposition
-            lines.append(f"Final disposition: {verdict.upper()} (L{ln}).")
+            lines.append(f"{top}Final disposition: {verdict.upper()} (L{ln}).")
 
         if pkt_changes:
             ln, a, b = pkt_changes[0]
@@ -339,15 +359,25 @@ def story_for_trace(events: List[TraceEvent], *, markdown: bool = False) -> str:
             if a_p == b_p:
                 if a_sp is not None and a_dp is not None and b_sp is not None and b_dp is not None:
                     lines.append(
-                        f"Flow changed at L{ln}: {a_p} {a_s}:{a_sp} → {a_d}:{a_dp} became {b_s}:{b_sp} → {b_d}:{b_dp}."
+                        f"{top}Flow changed at L{ln}: {a_p} {a_s}:{a_sp} → {a_d}:{a_dp} became {b_s}:{b_sp} → {b_d}:{b_dp}."
                     )
                 else:
-                    lines.append(f"Addresses changed at L{ln}: {a_s} → {a_d} became {b_s} → {b_d}.")
+                    lines.append(f"{top}Addresses changed at L{ln}: {a_s} → {a_d} became {b_s} → {b_d}.")
             else:
-                lines.append(f"Packet headers changed at L{ln} (possible NAT/rewrite).")
+                lines.append(f"{top}Packet headers changed at L{ln} (possible NAT/rewrite).")
 
-        if tables:
-            lines.append("Tables visited: " + ", ".join(tables) + ".")
+        if table_order:
+            lines.append(f"{top}Tables visited:")
+            for t in table_order:
+                chains = table_chains.get(t) or []
+                if as_markdown:
+                    t_disp = f"`{t}`"
+                else:
+                    t_disp = t
+                if chains:
+                    lines.append(f"{sub}{t_disp}: " + ", ".join(chains))
+                else:
+                    lines.append(f"{sub}{t_disp}")
         return lines
 
     # Build output
@@ -357,8 +387,7 @@ def story_for_trace(events: List[TraceEvent], *, markdown: bool = False) -> str:
         out.append(f"## {title}")
         out.append("")
         out.append("### Story")
-        for line in _narrative_lines():
-            out.append(f"- {line}")
+        out.extend(_story_lines(as_markdown=True))
         out.append("")
         if flow:
             out.append(f"- **Flow**: {flow}")
@@ -369,17 +398,18 @@ def story_for_trace(events: List[TraceEvent], *, markdown: bool = False) -> str:
         if ttl_changes:
             changes = ", ".join(f"L{ln}: {a}→{b}" for ln, a, b in ttl_changes)
             out.append(f"- **TTL changes**: {changes}")
-        out.append("")
-        out.append("### Timeline")
-        for e in events:
-            out.append(f"- L{e.line_no}: {_format_event_short(e)}")
-        out.append("")
+        if include_timeline:
+            out.append("")
+            out.append("### Timeline")
+            for e in events:
+                out.append(f"- L{e.line_no}: {_format_event_short(e)}")
+            out.append("")
     else:
         out.append(title)
         out.append("")
         out.append("Story:")
-        for line in _narrative_lines():
-            out.append(f"  - {line}")
+        for line in _story_lines(as_markdown=False):
+            out.append("  " + line)
         out.append("")
         if flow:
             out.append(f"Flow: {flow}")
@@ -390,16 +420,19 @@ def story_for_trace(events: List[TraceEvent], *, markdown: bool = False) -> str:
         if ttl_changes:
             changes = ", ".join(f"L{ln}: {a}->{b}" for ln, a, b in ttl_changes)
             out.append(f"TTL changes: {changes}")
-        out.append("")
-        out.append("Timeline:")
-        for e in events:
-            out.append(f"  L{e.line_no}: {_format_event_short(e)}")
-        out.append("")
+        if include_timeline:
+            out.append("")
+            out.append("Timeline:")
+            for e in events:
+                out.append(f"  L{e.line_no}: {_format_event_short(e)}")
+            out.append("")
 
     return "\n".join(out)
 
 
-def build_stories(all_events: List[TraceEvent], *, markdown: bool = False) -> str:
+def build_stories(
+    all_events: List[TraceEvent], *, markdown: bool = False, include_timeline: bool = True
+) -> str:
     grouped: dict[str, List[TraceEvent]] = defaultdict(list)
     for e in all_events:
         grouped[e.trace_id].append(e)
@@ -413,7 +446,9 @@ def build_stories(all_events: List[TraceEvent], *, markdown: bool = False) -> st
 
     blocks: List[str] = []
     for tid in seen:
-        blocks.append(story_for_trace(grouped[tid], markdown=markdown))
+        blocks.append(
+            story_for_trace(grouped[tid], markdown=markdown, include_timeline=include_timeline)
+        )
 
     sep = "\n" if markdown else "\n"
     return sep.join(blocks).rstrip() + ("\n" if blocks else "")
@@ -523,6 +558,11 @@ def main(argv: Optional[List[str]] = None) -> int:
         action="store_true",
         help="Only output per-packet lines (trace id + packet info).",
     )
+    p.add_argument(
+        "--no-timeline",
+        action="store_true",
+        help="Omit the Timeline section from story output.",
+    )
     args = p.parse_args(argv)
 
     try:
@@ -546,7 +586,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     elif args.packets_only:
         rendered = render_packets_only(events, markdown=md)
     else:
-        rendered = build_stories(events, markdown=md)
+        rendered = build_stories(events, markdown=md, include_timeline=(not args.no_timeline))
     if args.out == "-":
         sys.stdout.write(rendered)
         return 0
