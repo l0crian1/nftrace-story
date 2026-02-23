@@ -30,6 +30,14 @@ TRACE_BASE_RE = re.compile(
     re.VERBOSE,
 )
 
+# Common trace payload regexes (compiled once; story_for_trace is called per trace id)
+VERDICT_PAREN_RE = re.compile(r"\(verdict\s+([^)]+)\)", re.IGNORECASE)
+VERDICT_SUFFIX_RE = re.compile(r"\s*\(verdict[^)]*\)\s*$", re.IGNORECASE)
+DNAT_RE = re.compile(r"\bdnat\s+to\s+(.+)$", re.IGNORECASE)
+SNAT_RE = re.compile(r"\bsnat\s+to\s+(.+)$", re.IGNORECASE)
+MASQUERADE_RE = re.compile(r"\bmasquerade\b", re.IGNORECASE)
+MSS_SET_RE = re.compile(r"\bmaxseg\s+size\s+set\s+(.+)$", re.IGNORECASE)
+
 DISPOSITION_RE = re.compile(
     r"""
     (?:
@@ -417,8 +425,6 @@ def story_for_trace(
     # Rules hit (nft "rule ..." trace lines)
     # Keep output bounded: list first N unique rules in encounter order, count repeats.
     MAX_RULES = 50
-    verdict_paren_re = re.compile(r"\(verdict\s+([^)]+)\)", re.IGNORECASE)
-    rule_suffix_re = re.compile(r"\s*\(verdict[^)]*\)\s*$", re.IGNORECASE)
 
     rule_order: List[Tuple[str, str, str, str]] = []  # (table, chain, rule_text, verdict)
     rule_counts: dict[Tuple[str, str, str, str], int] = {}
@@ -429,12 +435,12 @@ def story_for_trace(
         if not payload.lower().startswith("rule "):
             continue
 
-        verdict_m = verdict_paren_re.search(payload)
+        verdict_m = VERDICT_PAREN_RE.search(payload)
         verdict = verdict_m.group(1).strip() if verdict_m else ""
 
         # Compact display: drop the leading "rule " and strip trailing "(verdict ...)".
         rule_text = payload[5:].strip()
-        rule_text = rule_suffix_re.sub("", rule_text).strip()
+        rule_text = VERDICT_SUFFIX_RE.sub("", rule_text).strip()
 
         key = (e.table, e.chain, rule_text, verdict)
         if key not in rule_counts:
@@ -448,23 +454,20 @@ def story_for_trace(
     # NAT detection heuristics: look for common nft output phrases.
     NAT_MAX_HITS = 10
     nat_hits: List[Tuple[int, str]] = []  # (line_no, message)
-    dnat_re = re.compile(r"\bdnat\s+to\s+(.+)$", re.IGNORECASE)
-    snat_re = re.compile(r"\bsnat\s+to\s+(.+)$", re.IGNORECASE)
-    masquerade_re = re.compile(r"\bmasquerade\b", re.IGNORECASE)
     for e in events:
         payload = (e.payload or "").strip()
         if not payload:
             continue
 
-        m = dnat_re.search(payload)
+        m = DNAT_RE.search(payload)
         if m:
-            target = m.group(1).strip()
+            target = VERDICT_SUFFIX_RE.sub("", m.group(1).strip()).strip()
             nat_hits.append((e.line_no, f"DNAT to {target}"))
-        m = snat_re.search(payload)
+        m = SNAT_RE.search(payload)
         if m:
-            target = m.group(1).strip()
+            target = VERDICT_SUFFIX_RE.sub("", m.group(1).strip()).strip()
             nat_hits.append((e.line_no, f"SNAT to {target}"))
-        if masquerade_re.search(payload):
+        if MASQUERADE_RE.search(payload):
             nat_hits.append((e.line_no, "Masquerade"))
 
         if len(nat_hits) >= NAT_MAX_HITS:
@@ -524,16 +527,15 @@ def story_for_trace(
     # Likely MSS rewrite detection (tcp mss clamping / rewriting)
     MSS_MAX_HITS = 10
     mss_hits: List[Tuple[int, str]] = []  # (line_no, set_value)
-    mss_set_re = re.compile(r"\bmaxseg\s+size\s+set\s+(.+)$", re.IGNORECASE)
     for e in events:
         payload = (e.payload or "").strip()
         if not payload:
             continue
-        m = mss_set_re.search(payload)
+        m = MSS_SET_RE.search(payload)
         if not m:
             continue
         # Value can be numeric ("1300") or route-based ("rt mtu"), etc.
-        set_value = m.group(1).strip()
+        set_value = VERDICT_SUFFIX_RE.sub("", m.group(1).strip()).strip()
         mss_hits.append((e.line_no, set_value))
         if len(mss_hits) >= MSS_MAX_HITS:
             break

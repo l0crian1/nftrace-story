@@ -91,7 +91,7 @@ Example output:
 - NAT detected:
   - L271: Masquerade
 - MSS rewrite detected:
-  - L259: maxseg size set rt mtu (verdict continue)
+  - L259: maxseg size set rt mtu
 - Tables visited:
   - `trace`: prerouting
   - `vyos_conntrack`: PREROUTING, VYOS_CT_IGNORE, FW_CONNTRACK, NAT_CONNTRACK, PREROUTING_HELPER, VYOS_CT_HELPER
