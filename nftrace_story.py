@@ -352,6 +352,57 @@ def story_for_trace(
         if len(nat_hits) >= NAT_MAX_HITS:
             break
 
+    # NAT/rewrite signal #2: if the saddr/daddr changes within the same trace id,
+    # that strongly suggests DNAT/SNAT (or other header rewrite). Optionally include port changes.
+    rewrite_hits: List[Tuple[int, str]] = []  # (line_no, message)
+
+    def pkt_sig(p: PacketView) -> Optional[Tuple[str, str, str, Optional[int], Optional[int]]]:
+        if not p.ip_saddr or not p.ip_daddr:
+            return None
+        proto = (p.ip_protocol or "").lower()
+        if proto == "tcp":
+            return (p.ip_saddr, p.ip_daddr, proto, p.tcp_sport, p.tcp_dport)
+        if proto == "udp":
+            return (p.ip_saddr, p.ip_daddr, proto, p.udp_sport, p.udp_dport)
+        return (p.ip_saddr, p.ip_daddr, proto, None, None)
+
+    prev_sig: Optional[Tuple[str, str, str, Optional[int], Optional[int]]] = None
+    prev_flow: Optional[str] = None
+    for e in events:
+        sig = pkt_sig(e.pkt)
+        if sig is None:
+            continue
+
+        flow = _flow_tuple(e.pkt) or f"{sig[0]} → {sig[1]}"
+        if prev_sig is not None and sig != prev_sig:
+            saddr0, daddr0, proto0, sport0, dport0 = prev_sig
+            saddr1, daddr1, proto1, sport1, dport1 = sig
+
+            # Only call it out if saddr/daddr changes (per request). Include port changes as extra detail.
+            addr_changed = (saddr0 != saddr1) or (daddr0 != daddr1)
+            if addr_changed:
+                before = prev_flow or f"{proto0} {saddr0} → {daddr0}"
+                after = flow
+
+                changes: List[str] = []
+                if saddr0 != saddr1:
+                    changes.append(f"saddr {saddr0} → {saddr1}")
+                if daddr0 != daddr1:
+                    changes.append(f"daddr {daddr0} → {daddr1}")
+                if sport0 != sport1 and (sport0 is not None or sport1 is not None):
+                    changes.append(f"sport {sport0} → {sport1}")
+                if dport0 != dport1 and (dport0 is not None or dport1 is not None):
+                    changes.append(f"dport {dport0} → {dport1}")
+
+                detail = "; ".join(changes) if changes else "flow changed"
+                # Only keep the first rewrite. Subsequent "rewrites" are often just
+                # different packet renderings at different hooks/tables.
+                rewrite_hits.append((e.line_no, f"Flow rewrite: {before} became {after} ({detail})"))
+                break
+
+        prev_sig = sig
+        prev_flow = flow
+
     # Likely MSS rewrite detection (tcp mss clamping / rewriting)
     MSS_MAX_HITS = 10
     mss_hits: List[Tuple[int, str]] = []  # (line_no, set_value)
@@ -407,6 +458,11 @@ def story_for_trace(
         if nat_hits:
             lines.append(f"{top}NAT detected:")
             for ln, msg in nat_hits:
+                lines.append(f"{sub}L{ln}: {msg}")
+        if rewrite_hits:
+            if not nat_hits:
+                lines.append(f"{top}NAT detected:")
+            for ln, msg in rewrite_hits:
                 lines.append(f"{sub}L{ln}: {msg}")
 
         if mss_hits:
