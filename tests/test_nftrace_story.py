@@ -1,14 +1,19 @@
+import sys
 import pathlib
 import unittest
+
+# Make repo root importable no matter where this test is run from.
+REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 from nftrace_story import build_stories, parse_trace_lines, render_packets_only, summarize_trace_ids
 
 
 class TestNftraceStory(unittest.TestCase):
     def test_example_trace_parses_and_renders(self) -> None:
-        repo_root = pathlib.Path(__file__).resolve().parents[1]
         # Accept either sample file name
-        candidates = sorted(repo_root.glob("example*.trace"))
+        candidates = sorted(REPO_ROOT.glob("example*.trace"))
         self.assertTrue(candidates, "expected an example*.trace file in repo root")
         trace_path = candidates[0]
         text = trace_path.read_text(encoding="utf-8", errors="replace")
