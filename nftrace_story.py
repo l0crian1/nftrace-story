@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import dataclasses
+import ipaddress
 import re
 import sys
 from collections import defaultdict
@@ -27,6 +28,17 @@ TRACE_BASE_RE = re.compile(
     (?P<rest>.*)
     $""",
     re.VERBOSE,
+)
+
+DISPOSITION_RE = re.compile(
+    r"""
+    (?:
+        \(verdict\s+(?P<v1>accept|drop|reject)\b |
+        \bverdict\s+(?P<v2>accept|drop|reject)\b |
+        \bpolicy\s+(?P<v3>accept|drop|reject)\b
+    )
+    """,
+    re.IGNORECASE | re.VERBOSE,
 )
 
 
@@ -197,23 +209,147 @@ def _primary_event(events: Sequence[TraceEvent]) -> TraceEvent:
     return next((e for e in events if e.pkt.ip_saddr and e.pkt.ip_daddr), events[0])
 
 
-def _format_packet_one_line(e: TraceEvent) -> str:
+def _final_disposition(events: Sequence[TraceEvent]) -> Optional[Tuple[int, str]]:
     """
-    A compact per-packet view suitable for selecting a trace id.
+    Returns (line_no, verdict) for the last accept/drop/reject observed in the trace.
     """
-    flow = _flow_tuple(e.pkt) or "(no ip flow)"
-    bits: List[str] = [f"L{e.line_no}", f"id={e.trace_id}", flow]
-    if e.pkt.iif:
-        bits.append(f'iif="{e.pkt.iif}"')
-    if e.pkt.oif:
-        bits.append(f'oif="{e.pkt.oif}"')
-    if e.pkt.ip_ttl is not None:
-        bits.append(f"ttl={e.pkt.ip_ttl}")
-    if e.pkt.ip_length is not None:
-        bits.append(f"len={e.pkt.ip_length}")
-    if e.pkt.tcp_flags:
-        bits.append(f"tcp_flags={e.pkt.tcp_flags}")
-    return " | ".join(bits)
+    final: Optional[Tuple[int, str]] = None
+    for e in events:
+        m = DISPOSITION_RE.search(e.payload)
+        if not m:
+            continue
+        verdict = (m.group("v1") or m.group("v2") or m.group("v3") or "").lower()
+        if verdict:
+            final = (e.line_no, verdict)
+    return final
+
+
+def _parse_filter_arg(filter_arg: str) -> dict[str, List[str]]:
+    """
+    Parse --filter like: "srcaddr=1.2.3.4,dstport=443,verdict=accept"
+    Values may be OR'd with "|": "dstport=22|443"
+    """
+    crit: dict[str, List[str]] = {}
+    for raw in filter_arg.split(","):
+        raw = raw.strip()
+        if not raw:
+            continue
+        if "=" not in raw:
+            raise ValueError(f"invalid filter token {raw!r} (expected key=value)")
+        k, v = raw.split("=", 1)
+        k = k.strip().lower()
+        v = v.strip()
+        if not k or not v:
+            raise ValueError(f"invalid filter token {raw!r} (empty key or value)")
+
+        # aliases
+        aliases = {
+            "srcadd": "srcaddr",
+            "saddr": "srcaddr",
+            "dstadd": "dstaddr",
+            "daddr": "dstaddr",
+            "sport": "srcport",
+            "dport": "dstport",
+            "finalverdict": "verdict",
+        }
+        k = aliases.get(k, k)
+
+        allowed = {"srcaddr", "dstaddr", "srcport", "dstport", "verdict"}
+        if k not in allowed:
+            raise ValueError(f"unknown filter key {k!r} (allowed: {', '.join(sorted(allowed))})")
+
+        vals = [vv.strip() for vv in v.split("|") if vv.strip()]
+        if not vals:
+            raise ValueError(f"invalid filter token {raw!r} (no values)")
+        crit.setdefault(k, []).extend(vals)
+
+    # normalize / validate values
+    if "verdict" in crit:
+        crit["verdict"] = [v.lower() for v in crit["verdict"]]
+        for v in crit["verdict"]:
+            if v not in {"accept", "drop", "reject"}:
+                raise ValueError("verdict must be one of: accept, drop, reject")
+
+    for pk in ("srcport", "dstport"):
+        if pk in crit:
+            for v in crit[pk]:
+                if not v.isdigit():
+                    raise ValueError(f"{pk} must be numeric (got {v!r})")
+                p = int(v)
+                if p < 1 or p > 65535:
+                    raise ValueError(f"{pk} must be in range 1-65535 (got {p})")
+
+    for ak in ("srcaddr", "dstaddr"):
+        if ak in crit:
+            normalized: List[str] = []
+            for v in crit[ak]:
+                try:
+                    normalized.append(str(ipaddress.ip_address(v)))
+                except ValueError:
+                    raise ValueError(f"{ak} must be a valid IPv4/IPv6 address (got {v!r})")
+            crit[ak] = normalized
+
+    return crit
+
+
+def _trace_matches_filter(events: Sequence[TraceEvent], crit: dict[str, List[str]]) -> bool:
+    """
+    A trace matches if:
+    - verdict filter matches final disposition (if specified)
+    - and there exists at least one packet event that matches all address/port criteria (if any specified)
+    """
+    if not crit:
+        return True
+
+    if "verdict" in crit:
+        fd = _final_disposition(events)
+        if not fd:
+            return False
+        _, verdict = fd
+        if verdict not in set(crit["verdict"]):
+            return False
+
+    packet_keys = {"srcaddr", "dstaddr", "srcport", "dstport"}
+    packet_crit = {k: crit[k] for k in crit.keys() if k in packet_keys}
+    if not packet_crit:
+        return True
+
+    srcaddr_set = set(packet_crit.get("srcaddr", []))
+    dstaddr_set = set(packet_crit.get("dstaddr", []))
+    srcport_set = set(int(v) for v in packet_crit.get("srcport", []))
+    dstport_set = set(int(v) for v in packet_crit.get("dstport", []))
+
+    for e in events:
+        p = e.pkt
+        if not (p.ip_saddr and p.ip_daddr):
+            continue
+
+        # Normalize packet addresses to match normalized filter values.
+        try:
+            p_src = str(ipaddress.ip_address(p.ip_saddr))
+            p_dst = str(ipaddress.ip_address(p.ip_daddr))
+        except ValueError:
+            # If the trace has weird/non-IP values, skip this event for addr-based filtering.
+            continue
+
+        if srcaddr_set and p_src not in srcaddr_set:
+            continue
+        if dstaddr_set and p_dst not in dstaddr_set:
+            continue
+
+        if srcport_set:
+            sp = p.tcp_sport if p.tcp_sport is not None else p.udp_sport
+            if sp is None or sp not in srcport_set:
+                continue
+
+        if dstport_set:
+            dp = p.tcp_dport if p.tcp_dport is not None else p.udp_dport
+            if dp is None or dp not in dstport_set:
+                continue
+
+        return True
+
+    return False
 
 
 def _format_event_short(e: TraceEvent) -> str:
@@ -307,25 +443,7 @@ def story_for_trace(
             rule_first_line[key] = e.line_no
         rule_counts[key] += 1
 
-    # Verdict / disposition (accept/drop/reject) and NAT-ish flow changes.
-    disposition_re = re.compile(
-        r"""
-        (?:
-            \(verdict\s+(?P<v1>accept|drop|reject)\b |
-            \bverdict\s+(?P<v2>accept|drop|reject)\b |
-            \bpolicy\s+(?P<v3>accept|drop|reject)\b
-        )
-        """,
-        re.IGNORECASE | re.VERBOSE,
-    )
-
-    final_disposition: Optional[Tuple[int, str]] = None  # (line_no, verdict)
-    for e in events:
-        m = disposition_re.search(e.payload)
-        if m:
-            verdict = (m.group("v1") or m.group("v2") or m.group("v3") or "").lower()
-            if verdict:
-                final_disposition = (e.line_no, verdict)
+    final_disposition = _final_disposition(events)
 
     # NAT detection heuristics: look for common nft output phrases.
     NAT_MAX_HITS = 10
@@ -636,27 +754,6 @@ def summarize_trace_ids(all_events: List[TraceEvent], *, markdown: bool = False)
     return "\n".join(lines)
 
 
-def render_packets_only(all_events: List[TraceEvent], *, markdown: bool = False) -> str:
-    """
-    Prints only packet events (trace id + parsed packet tuple).
-    """
-    pkt_events = [e for e in all_events if e.pkt.ip_saddr and e.pkt.ip_daddr]
-    lines: List[str] = []
-    if markdown:
-        lines.append("## Packets")
-        lines.append("")
-        for e in pkt_events:
-            lines.append(f"- {_format_packet_one_line(e)}")
-        lines.append("")
-    else:
-        lines.append("Packets")
-        lines.append("")
-        for e in pkt_events:
-            lines.append("  " + _format_packet_one_line(e))
-        lines.append("")
-    return "\n".join(lines)
-
-
 def main(argv: Optional[List[str]] = None) -> int:
     p = argparse.ArgumentParser(
         description="Turn nftrace output (nft monitor trace) into a human readable story."
@@ -690,16 +787,32 @@ def main(argv: Optional[List[str]] = None) -> int:
         help="Only include a specific trace id (hex string) in the output.",
     )
     p.add_argument(
-        "--packets-only",
-        action="store_true",
-        help="Only output per-packet lines (trace id + packet info).",
-    )
-    p.add_argument(
         "--show-timeline",
         action="store_true",
         help="Include the Timeline section in story output.",
     )
+    p.add_argument(
+        "--filter",
+        dest="trace_filter",
+        help='Filter traces, e.g. --filter "srcaddr=1.2.3.4,dstport=443,verdict=accept"',
+    )
     args = p.parse_args(argv)
+
+    if args.trace_id and args.trace_filter:
+        print(
+            "error: --id and --filter cannot be used together (choose one).",
+            file=sys.stderr,
+        )
+        return 2
+
+    # Validate filter early (before reading/parsing the input file).
+    crit: Optional[dict[str, List[str]]] = None
+    if args.trace_filter:
+        try:
+            crit = _parse_filter_arg(args.trace_filter)
+        except ValueError as e:
+            print(f"error: invalid --filter: {e}", file=sys.stderr)
+            return 2
 
     try:
         with open(args.trace_file, "r", encoding="utf-8", errors="replace") as f:
@@ -725,11 +838,23 @@ def main(argv: Optional[List[str]] = None) -> int:
             print(f"error: trace id {args.trace_id!r} not found in input", file=sys.stderr)
             return 2
 
+    # Optional filter system (applies to all output modes, including --list-ids)
+    if crit is not None:
+        grouped: dict[str, List[TraceEvent]] = defaultdict(list)
+        for e in events:
+            grouped[e.trace_id].append(e)
+
+        keep_ids = {
+            tid for tid, evs in grouped.items() if tid != "(unparsed)" and _trace_matches_filter(evs, crit)
+        }
+        events = [e for e in events if e.trace_id in keep_ids]
+        if not any(e.trace_id != "(unparsed)" for e in events):
+            print("error: no traces matched --filter", file=sys.stderr)
+            return 2
+
     md = args.format == "markdown"
     if args.list_ids:
         rendered = summarize_trace_ids(events, markdown=md)
-    elif args.packets_only:
-        rendered = render_packets_only(events, markdown=md)
     else:
         rendered = build_stories(events, markdown=md, include_timeline=args.show_timeline)
     if args.out == "-":

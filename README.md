@@ -28,16 +28,16 @@ python nftrace_story.py "example trace.trace" --id 07c9c091
 python nftrace_story.py "example trace.trace" --show-timeline
 ```
 
-- **Packets-only (trace id + packet tuple, no story/timeline)**:
+- **Filter traces** (applies to `--list-ids` and default story output):
 
 ```bash
-python nftrace_story.py "example trace.trace" --packets-only
+python nftrace_story.py "example trace.trace" --filter "srcaddr=1.2.3.4,dstport=443,verdict=accept"
 ```
 
-- **Packets-only for a specific trace id**:
+- **Filter + list ids**:
 
 ```bash
-python nftrace_story.py "example trace.trace" --packets-only --id 07c9c091
+python nftrace_story.py "example trace.trace" --list-ids --filter "dstport=22|443"
 ```
 
 - **Markdown output**:
