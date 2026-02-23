@@ -578,7 +578,16 @@ def build_stories(
             story_for_trace(grouped[tid], markdown=markdown, include_timeline=include_timeline)
         )
 
-    return "\n".join(blocks).rstrip() + ("\n" if blocks else "")
+    if not blocks:
+        return ""
+
+    if markdown:
+        joined = "\n".join(blocks)
+    else:
+        delim = "\n" + ("-" * 72) + "\n"
+        joined = delim.join(blocks)
+
+    return joined.rstrip() + "\n"
 
 
 def summarize_trace_ids(all_events: List[TraceEvent], *, markdown: bool = False) -> str:
@@ -697,6 +706,15 @@ def main(argv: Optional[List[str]] = None) -> int:
             events = parse_trace_lines(f, include_nontrace_lines=args.include_nontrace_lines)
     except OSError as e:
         print(f"error: failed to read {args.trace_file!r}: {e}", file=sys.stderr)
+        return 2
+
+    # If we didn't see any "trace id ..." lines, avoid failing silently.
+    if not any(e.trace_id != "(unparsed)" for e in events):
+        print(
+            "error: no trace events found (no 'trace id ...' lines detected). "
+            "Is this the right file?",
+            file=sys.stderr,
+        )
         return 2
 
     # Optional trace id filter
