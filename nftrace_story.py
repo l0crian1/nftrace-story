@@ -375,59 +375,17 @@ def _format_event_short(e: TraceEvent) -> str:
     return " | ".join(parts)
 
 
-def story_for_trace(
-    events: List[TraceEvent], *, markdown: bool = False, include_timeline: bool = False
-) -> str:
+def _collect_rule_hits(
+    events: Sequence[TraceEvent],
+) -> Tuple[List[Tuple[str, str, str, str]], dict[Tuple[str, str, str, str], int]]:
     """
-    Produce a story for a single trace id.
+    Collect unique nft \"rule ...\" hits in encounter order.
+
+    Returns:
+      - rule_order: list of (table, chain, rule_text, verdict)
+      - rule_first_line: mapping from that tuple to the first line number seen
     """
-    if not events:
-        return ""
-
-    # Prefer a "packet-like" event for story metadata (flow/ingress),
-    # since traces can include many non-packet lines (rule/verdict/policy).
-    primary = next((e for e in events if e.pkt.ip_saddr and e.pkt.ip_daddr), events[0])
-    flow = _flow_tuple(primary.pkt)
-
-    # Detect key transitions for "story" callouts
-    iif0 = primary.pkt.iif
-    oif_first = next((e.pkt.oif for e in events if e.pkt.oif), None)
-    last = events[-1]
-    last_hook = next((e.hook_hint for e in reversed(events) if e.hook_hint), None)
-    ttl_decrement_by_one_line: Optional[int] = None
-    prev_ttl: Optional[int] = None
-    for e in events:
-        ttl = e.pkt.ip_ttl
-        if ttl is None:
-            continue
-        if (
-            ttl_decrement_by_one_line is None
-            and prev_ttl is not None
-            and (prev_ttl - ttl) == 1
-        ):
-            ttl_decrement_by_one_line = e.line_no
-        prev_ttl = ttl
-
-    table_order: List[str] = []
-    table_chains: dict[str, List[str]] = {}
-    for e in events:
-        t = e.table
-        if t == "?":
-            continue
-        if t not in table_chains:
-            table_chains[t] = []
-            table_order.append(t)
-
-        c = e.chain
-        if c != "?" and c not in table_chains[t]:
-            table_chains[t].append(c)
-
-    # Rules hit (nft "rule ..." trace lines)
-    # Keep output bounded: list first N unique rules in encounter order, count repeats.
-    MAX_RULES = 50
-
-    rule_order: List[Tuple[str, str, str, str]] = []  # (table, chain, rule_text, verdict)
-    rule_counts: dict[Tuple[str, str, str, str], int] = {}
+    rule_order: List[Tuple[str, str, str, str]] = []
     rule_first_line: dict[Tuple[str, str, str, str], int] = {}
 
     for e in events:
@@ -443,17 +401,33 @@ def story_for_trace(
         rule_text = VERDICT_SUFFIX_RE.sub("", rule_text).strip()
 
         key = (e.table, e.chain, rule_text, verdict)
-        if key not in rule_counts:
+        if key not in rule_first_line:
             rule_order.append(key)
-            rule_counts[key] = 0
             rule_first_line[key] = e.line_no
-        rule_counts[key] += 1
 
-    final_disposition = _final_disposition(events)
+    return rule_order, rule_first_line
 
-    # NAT detection heuristics: look for common nft output phrases.
+
+def _pkt_sig(p: PacketView) -> Optional[Tuple[str, str, str, Optional[int], Optional[int]]]:
+    if not p.ip_saddr or not p.ip_daddr:
+        return None
+    proto = (p.ip_protocol or "").lower()
+    if proto == "tcp":
+        return (p.ip_saddr, p.ip_daddr, proto, p.tcp_sport, p.tcp_dport)
+    if proto == "udp":
+        return (p.ip_saddr, p.ip_daddr, proto, p.udp_sport, p.udp_dport)
+    return (p.ip_saddr, p.ip_daddr, proto, None, None)
+
+
+def _collect_nat_hits(events: Sequence[TraceEvent]) -> Tuple[List[Tuple[int, str]], List[Tuple[int, str]]]:
+    """
+    NAT detection heuristics:
+      - keyword hits: dnat to / snat to / masquerade (capped)
+      - first saddr/daddr rewrite detected within this trace id (0 or 1 entries)
+    """
     NAT_MAX_HITS = 10
-    nat_hits: List[Tuple[int, str]] = []  # (line_no, message)
+    nat_hits: List[Tuple[int, str]] = []
+
     for e in events:
         payload = (e.payload or "").strip()
         if not payload:
@@ -473,24 +447,13 @@ def story_for_trace(
         if len(nat_hits) >= NAT_MAX_HITS:
             break
 
-    # NAT/rewrite signal #2: if the saddr/daddr changes within the same trace id,
-    # that strongly suggests DNAT/SNAT (or other header rewrite). Optionally include port changes.
-    rewrite_hits: List[Tuple[int, str]] = []  # (line_no, message)
-
-    def pkt_sig(p: PacketView) -> Optional[Tuple[str, str, str, Optional[int], Optional[int]]]:
-        if not p.ip_saddr or not p.ip_daddr:
-            return None
-        proto = (p.ip_protocol or "").lower()
-        if proto == "tcp":
-            return (p.ip_saddr, p.ip_daddr, proto, p.tcp_sport, p.tcp_dport)
-        if proto == "udp":
-            return (p.ip_saddr, p.ip_daddr, proto, p.udp_sport, p.udp_dport)
-        return (p.ip_saddr, p.ip_daddr, proto, None, None)
-
+    # Rewrite signal: first change in saddr/daddr (with extra detail if ports change too)
+    rewrite_hits: List[Tuple[int, str]] = []
     prev_sig: Optional[Tuple[str, str, str, Optional[int], Optional[int]]] = None
     prev_flow: Optional[str] = None
+
     for e in events:
-        sig = pkt_sig(e.pkt)
+        sig = _pkt_sig(e.pkt)
         if sig is None:
             continue
 
@@ -499,7 +462,6 @@ def story_for_trace(
             saddr0, daddr0, proto0, sport0, dport0 = prev_sig
             saddr1, daddr1, proto1, sport1, dport1 = sig
 
-            # Only call it out if saddr/daddr changes (per request). Include port changes as extra detail.
             addr_changed = (saddr0 != saddr1) or (daddr0 != daddr1)
             if addr_changed:
                 before = prev_flow or f"{proto0} {saddr0} → {daddr0}"
@@ -516,17 +478,24 @@ def story_for_trace(
                     changes.append(f"dport {dport0} → {dport1}")
 
                 detail = "; ".join(changes) if changes else "flow changed"
-                # Only keep the first rewrite. Subsequent "rewrites" are often just
-                # different packet renderings at different hooks/tables.
-                rewrite_hits.append((e.line_no, f"Flow rewrite: {before} became {after} ({detail})"))
+                rewrite_hits.append(
+                    (e.line_no, f"Flow rewrite: {before} became {after} ({detail})")
+                )
                 break
 
         prev_sig = sig
         prev_flow = flow
 
-    # Likely MSS rewrite detection (tcp mss clamping / rewriting)
+    return nat_hits, rewrite_hits
+
+
+def _collect_mss_hits(events: Sequence[TraceEvent]) -> List[Tuple[int, str]]:
+    """
+    Detect likely MSS rewrites (tcp option maxseg size set ...), capped.
+    """
     MSS_MAX_HITS = 10
-    mss_hits: List[Tuple[int, str]] = []  # (line_no, set_value)
+    mss_hits: List[Tuple[int, str]] = []
+
     for e in events:
         payload = (e.payload or "").strip()
         if not payload:
@@ -534,11 +503,83 @@ def story_for_trace(
         m = MSS_SET_RE.search(payload)
         if not m:
             continue
-        # Value can be numeric ("1300") or route-based ("rt mtu"), etc.
         set_value = VERDICT_SUFFIX_RE.sub("", m.group(1).strip()).strip()
         mss_hits.append((e.line_no, set_value))
         if len(mss_hits) >= MSS_MAX_HITS:
             break
+
+    return mss_hits
+
+
+def _ttl_decrement_by_one_line(events: Sequence[TraceEvent]) -> Optional[int]:
+    """
+    Return the line number of the first observed TTL decrement by 1, if any.
+    """
+    prev_ttl: Optional[int] = None
+    for e in events:
+        ttl = e.pkt.ip_ttl
+        if ttl is None:
+            continue
+        if prev_ttl is not None and (prev_ttl - ttl) == 1:
+            return e.line_no
+        prev_ttl = ttl
+    return None
+
+
+def _collect_tables_and_chains(
+    events: Sequence[TraceEvent],
+) -> Tuple[List[str], dict[str, List[str]]]:
+    """
+    Returns (table_order, table_chains) preserving encounter order and de-duping chains.
+    """
+    table_order: List[str] = []
+    table_chains: dict[str, List[str]] = {}
+
+    for e in events:
+        t = e.table
+        if t == "?":
+            continue
+        if t not in table_chains:
+            table_chains[t] = []
+            table_order.append(t)
+
+        c = e.chain
+        if c != "?" and c not in table_chains[t]:
+            table_chains[t].append(c)
+
+    return table_order, table_chains
+
+
+def story_for_trace(
+    events: List[TraceEvent], *, markdown: bool = False, include_timeline: bool = False
+) -> str:
+    """
+    Produce a story for a single trace id.
+    """
+    if not events:
+        return ""
+
+    # Prefer a "packet-like" event for story metadata (flow/ingress),
+    # since traces can include many non-packet lines (rule/verdict/policy).
+    primary = next((e for e in events if e.pkt.ip_saddr and e.pkt.ip_daddr), events[0])
+    flow = _flow_tuple(primary.pkt)
+
+    # Detect key transitions for "story" callouts
+    iif0 = primary.pkt.iif
+    oif_first = next((e.pkt.oif for e in events if e.pkt.oif), None)
+    last = events[-1]
+    last_hook = next((e.hook_hint for e in reversed(events) if e.hook_hint), None)
+    ttl_decrement_by_one_line = _ttl_decrement_by_one_line(events)
+    table_order, table_chains = _collect_tables_and_chains(events)
+
+    # Rules hit (nft "rule ..." trace lines)
+    MAX_RULES = 50
+    rule_order, rule_first_line = _collect_rule_hits(events)
+
+    final_disposition = _final_disposition(events)
+
+    nat_hits, rewrite_hits = _collect_nat_hits(events)
+    mss_hits = _collect_mss_hits(events)
 
     def _story_lines(*, as_markdown: bool) -> List[str]:
         """
@@ -619,13 +660,10 @@ def story_for_trace(
                 else:
                     tc_disp = f"{t}.{c}"
                 ln = rule_first_line[(t, c, rule_text, verdict)]
-                cnt = rule_counts[(t, c, rule_text, verdict)]
 
                 suffix_bits: List[str] = []
                 if verdict:
                     suffix_bits.append(f"verdict {verdict}")
-                if cnt > 1:
-                    suffix_bits.append(f"x{cnt}")
                 suffix = f" ({', '.join(suffix_bits)})" if suffix_bits else ""
 
                 lines.append(f"{sub}{tc_disp} L{ln}: {rule_text}{suffix}")
