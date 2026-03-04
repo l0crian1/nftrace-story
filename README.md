@@ -22,7 +22,7 @@ python nftrace_story.py "example trace.trace" --list-ids
 python nftrace_story.py "example trace.trace" --id 07c9c091
 ```
 
-- **Story with the timeline**:
+- **Story with the raw nftrace lines**:
 
 ```bash
 python nftrace_story.py "example trace.trace" --show-timeline

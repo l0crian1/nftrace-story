@@ -15,6 +15,7 @@ import dataclasses
 import ipaddress
 import re
 import sys
+import textwrap
 from collections import defaultdict
 from typing import Iterable, List, Optional, Sequence, Tuple
 
@@ -375,6 +376,30 @@ def _format_event_short(e: TraceEvent) -> str:
     return " | ".join(parts)
 
 
+def _format_raw_trace_line(e: TraceEvent) -> str:
+    # Normalize away any editor-export prefix like "L12:"; we add our own line numbers.
+    line = _strip_optional_line_number_prefix(e.raw).strip()
+    return f"L{e.line_no}: {line}"
+
+
+RAW_TRACE_WRAP_WIDTH = 120
+
+
+def _wrap_bullet(content: str, *, prefix: str, width: int = RAW_TRACE_WRAP_WIDTH) -> str:
+    """
+    Wrap a single bullet item to a fixed width, indenting continuation lines so
+    they remain visually under the bullet.
+    """
+    return textwrap.fill(
+        content,
+        width=width,
+        initial_indent=prefix,
+        subsequent_indent=" " * len(prefix),
+        break_long_words=False,
+        break_on_hyphens=False,
+    )
+
+
 def _collect_rule_hits(
     events: Sequence[TraceEvent],
 ) -> Tuple[List[Tuple[str, str, str, str]], dict[Tuple[str, str, str, str], int]]:
@@ -689,9 +714,9 @@ def story_for_trace(
             out.append(f'- **Egress**: forwarded out `"{oif_first}"`')
         if include_timeline:
             out.append("")
-            out.append("### Timeline")
+            out.append("### Raw trace")
             for e in events:
-                out.append(f"- L{e.line_no}: {_format_event_short(e)}")
+                out.append(_wrap_bullet(_format_raw_trace_line(e), prefix="- "))
             out.append("")
     else:
         out.append(title)
@@ -708,9 +733,9 @@ def story_for_trace(
             out.append(f'Egress: "{oif_first}"')
         if include_timeline:
             out.append("")
-            out.append("Timeline:")
+            out.append("Raw trace:")
             for e in events:
-                out.append(f"  L{e.line_no}: {_format_event_short(e)}")
+                out.append(_wrap_bullet(_format_raw_trace_line(e), prefix="  - "))
             out.append("")
 
     return "\n".join(out)
@@ -829,7 +854,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     p.add_argument(
         "--show-timeline",
         action="store_true",
-        help="Include the Timeline section in story output.",
+        help="Include the raw nftrace lines for each trace.",
     )
     p.add_argument(
         "--filter",
