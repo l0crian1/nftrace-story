@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import dataclasses
 import ipaddress
+import json
 import re
 import sys
 import textwrap
@@ -218,7 +219,7 @@ def _primary_event(events: Sequence[TraceEvent]) -> TraceEvent:
     return next((e for e in events if e.pkt.ip_saddr and e.pkt.ip_daddr), events[0])
 
 
-def _final_disposition(events: Sequence[TraceEvent]) -> Optional[Tuple[int, str]]:
+def _final_verdict(events: Sequence[TraceEvent]) -> Optional[Tuple[int, str]]:
     """
     Returns (line_no, verdict) for the last accept/drop/reject (final verdict) observed in the trace.
     """
@@ -311,7 +312,7 @@ def _trace_matches_filter(events: Sequence[TraceEvent], crit: dict[str, List[str
         return True
 
     if "verdict" in crit:
-        fd = _final_disposition(events)
+        fd = _final_verdict(events)
         if not fd:
             return False
         _, verdict = fd
@@ -359,21 +360,6 @@ def _trace_matches_filter(events: Sequence[TraceEvent], crit: dict[str, List[str
         return True
 
     return False
-
-
-def _format_event_short(e: TraceEvent) -> str:
-    parts: List[str] = []
-    where = f"{e.family} {e.table} {e.chain}"
-    parts.append(where)
-
-    if e.pkt.iif:
-        parts.append(f'iif="{e.pkt.iif}"')
-    if e.pkt.oif:
-        parts.append(f'oif="{e.pkt.oif}"')
-    if e.pkt.ip_ttl is not None:
-        parts.append(f"ttl={e.pkt.ip_ttl}")
-
-    return " | ".join(parts)
 
 
 def _format_raw_trace_line(e: TraceEvent) -> str:
@@ -572,6 +558,273 @@ def _collect_table_chain_path(events: Sequence[TraceEvent]) -> List[Tuple[str, s
     return path
 
 
+def _build_trace_story_dict(events: Sequence[TraceEvent], *, include_raw_trace: bool) -> dict:
+    """
+    Build a structured representation of a single trace id's story.
+    This dict is the source of truth for text/markdown output and JSON output.
+    """
+    if not events:
+        raise ValueError("events must be non-empty")
+
+    primary = next((e for e in events if e.pkt.ip_saddr and e.pkt.ip_daddr), events[0])
+    flow = _flow_tuple(primary.pkt)
+
+    iif0 = primary.pkt.iif
+    oif_first = next((e.pkt.oif for e in events if e.pkt.oif), None)
+    last = events[-1]
+    last_hook = next((e.hook_hint for e in reversed(events) if e.hook_hint), None)
+
+    ttl_dec_line = _ttl_decrement_by_one_line(events)
+    table_chain_path = _collect_table_chain_path(events)
+
+    max_rules = 50
+    rule_order, rule_first_line = _collect_rule_hits(events)
+    rules: List[dict] = []
+    for t, c, rule_text, verdict in rule_order:
+        rules.append(
+            {
+                "table": t,
+                "chain": c,
+                "line": rule_first_line[(t, c, rule_text, verdict)],
+                "rule": rule_text,
+                "verdict": verdict or None,
+            }
+        )
+
+    final = _final_verdict(events)
+    nat_hits, rewrite_hits = _collect_nat_hits(events)
+    mss_hits = _collect_mss_hits(events)
+
+    data: dict = {
+        "id": events[0].trace_id,
+        "flow": flow,
+        "ingress": iif0,
+        "egress": oif_first,
+        "ttl_decrement_by_one_line": ttl_dec_line,
+        "last": {"line": last.line_no, "hook": last_hook},
+        "final_verdict": ({"line": final[0], "verdict": final[1]} if final else None),
+        "nat": {
+            "hits": [{"line": ln, "message": msg} for ln, msg in nat_hits],
+            "rewrite": [{"line": ln, "message": msg} for ln, msg in rewrite_hits],
+        },
+        "mss_rewrite": [{"line": ln, "value": val} for ln, val in mss_hits],
+        "tables_visited": [{"table": t, "chain": c} for t, c in table_chain_path],
+        "rules_hit": rules,
+        "rules_cap": max_rules,
+    }
+
+    if include_raw_trace:
+        data["raw_trace"] = [{"line": e.line_no, "text": _format_raw_trace_line(e)} for e in events]
+
+    return data
+
+
+def _render_trace_story_dict(data: dict, *, markdown: bool, include_raw_trace: bool) -> str:
+    trace_id = data.get("id", "(unknown)")
+    title = f"Trace {trace_id}" if trace_id != "(unparsed)" else "Trace (unparsed)"
+
+    flow = data.get("flow")
+    iif0 = data.get("ingress")
+    oif_first = data.get("egress")
+    ttl_ln = data.get("ttl_decrement_by_one_line")
+    last = data.get("last") or {}
+    final = data.get("final_verdict")
+
+    nat = data.get("nat") or {}
+    nat_hits = nat.get("hits") or []
+    nat_rewrite = nat.get("rewrite") or []
+    mss_hits = data.get("mss_rewrite") or []
+    tables = data.get("tables_visited") or []
+    rules = data.get("rules_hit") or []
+    rules_cap = int(data.get("rules_cap") or 50)
+
+    out: List[str] = []
+
+    story_top_prefix = "- " if markdown else "  - "
+    story_sub_prefix = "  - " if markdown else "    - "
+
+    def emit_story_line(s: str) -> None:
+        out.append(f"{story_top_prefix}{s}")
+
+    if markdown:
+        out.append(f"## {title}")
+        out.append("")
+        out.append("### Story")
+    else:
+        out.append(title)
+        out.append("")
+        out.append("Story:")
+
+    subject = flow or "Packet"
+    if iif0:
+        emit_story_line(f'{subject} arrived on interface "{iif0}".')
+    else:
+        emit_story_line(f"{subject} appeared in nftrace output.")
+
+    if oif_first:
+        emit_story_line(f'Routing selected egress interface "{oif_first}" (forwarding path).')
+
+    if ttl_ln is not None:
+        emit_story_line(f"TTL was decremented by 1 at L{ttl_ln} (typical for forwarding).")
+
+    if last.get("hook"):
+        emit_story_line(f"It was last observed near the {last['hook']} hook (L{last.get('line')}).")
+    else:
+        emit_story_line(f"It was last observed at L{last.get('line')}.")
+
+    if final:
+        emit_story_line(f"Final verdict: {str(final['verdict']).upper()} (L{final['line']}).")
+
+    if nat_hits or nat_rewrite:
+        emit_story_line("NAT detected:")
+        for h in nat_hits:
+            out.append(f"{story_sub_prefix}L{h['line']}: {h['message']}")
+        for h in nat_rewrite:
+            out.append(f"{story_sub_prefix}L{h['line']}: {h['message']}")
+
+    if mss_hits:
+        emit_story_line("MSS rewrite detected:")
+        for h in mss_hits:
+            out.append(f"{story_sub_prefix}L{h['line']}: maxseg size set {h['value']}")
+
+    if tables:
+        emit_story_line("Tables visited:")
+        for tc in tables:
+            t = tc["table"]
+            c = tc["chain"]
+            if markdown:
+                out.append(f"{story_sub_prefix}`{t}`.`{c}`")
+            else:
+                out.append(f"{story_sub_prefix}{t}.{c}")
+
+    if rules:
+        shown = min(len(rules), rules_cap)
+        if len(rules) > shown:
+            emit_story_line(f"Rules hit (showing first {shown} of {len(rules)} unique rules):")
+        else:
+            emit_story_line("Rules hit:")
+
+        for r in rules[:shown]:
+            t = r["table"]
+            c = r["chain"]
+            ln = r["line"]
+            rule_text = r["rule"]
+            verdict = r.get("verdict")
+            tc_disp = f"`{t}`.`{c}`" if markdown else f"{t}.{c}"
+            suffix = f" (verdict {verdict})" if verdict else ""
+            out.append(f"{story_sub_prefix}{tc_disp} L{ln}: {rule_text}{suffix}")
+
+        if len(rules) > shown:
+            out.append(f"{story_sub_prefix}… plus {len(rules) - shown} more unique rules")
+
+    if markdown:
+        out.append("")
+        if flow:
+            out.append(f"- **Flow**: {flow}")
+        if iif0:
+            out.append(f'- **Ingress**: received on `"{iif0}"`')
+        if oif_first:
+            out.append(f'- **Egress**: forwarded out `"{oif_first}"`')
+        if include_raw_trace and data.get("raw_trace"):
+            out.append("")
+            out.append("### Raw trace")
+            for e in data["raw_trace"]:
+                out.append(_wrap_bullet(e["text"], prefix="- "))
+            out.append("")
+    else:
+        out.append("")
+        if flow:
+            out.append(f"Flow: {flow}")
+        if iif0:
+            out.append(f'Ingress: "{iif0}"')
+        if oif_first:
+            out.append(f'Egress: "{oif_first}"')
+        if include_raw_trace and data.get("raw_trace"):
+            out.append("")
+            out.append("Raw trace:")
+            for e in data["raw_trace"]:
+                out.append(_wrap_bullet(e["text"], prefix="  - "))
+            out.append("")
+
+    return "\n".join(out)
+
+
+def _group_events_by_trace_id(
+    all_events: Sequence[TraceEvent],
+) -> Tuple[dict[str, List[TraceEvent]], List[str]]:
+    """
+    Group events by trace id and return ids in first-seen order.
+    """
+    grouped: dict[str, List[TraceEvent]] = defaultdict(list)
+    seen: List[str] = []
+    seen_set: set[str] = set()
+
+    for e in all_events:
+        grouped[e.trace_id].append(e)
+        if e.trace_id not in seen_set:
+            seen_set.add(e.trace_id)
+            seen.append(e.trace_id)
+
+    return grouped, seen
+
+
+def _build_list_ids_dict(all_events: Sequence[TraceEvent]) -> dict:
+    grouped, seen = _group_events_by_trace_id(all_events)
+
+    rows: List[dict] = []
+    for tid in seen:
+        evs = grouped[tid]
+        primary = _primary_event(evs)
+        flow = _flow_tuple(primary.pkt) or "(no ip flow)"
+        packet_events = sum(1 for e in evs if e.pkt.ip_saddr and e.pkt.ip_daddr)
+        event_count = len(evs)
+        iif = primary.pkt.iif
+        oif = next((e.pkt.oif for e in evs if e.pkt.oif), None)
+        final = _final_verdict(evs)
+
+        rows.append(
+            {
+                "id": tid,
+                "flow": flow,
+                "packets": packet_events,
+                "events": event_count,
+                "iif": iif,
+                "oif": oif,
+                "verdict": ({"line": final[0], "verdict": final[1]} if final else None),
+            }
+        )
+
+    return {"trace_ids": rows}
+
+
+def _render_list_ids_dict(data: dict, *, markdown: bool) -> str:
+    lines: List[str] = []
+    if markdown:
+        lines.append("## Trace IDs")
+        lines.append("")
+    else:
+        lines.append("Trace IDs")
+        lines.append("")
+
+    for r in data["trace_ids"]:
+        parts = [r["id"], r["flow"], f"packets={r['packets']}", f"events={r['events']}"]
+        if r.get("iif"):
+            parts.append(f'iif="{r["iif"]}"')
+        if r.get("oif"):
+            parts.append(f'oif="{r["oif"]}"')
+        if r.get("verdict"):
+            v = r["verdict"]
+            parts.append(f'verdict={v["verdict"].upper()} (L{v["line"]})')
+
+        if markdown:
+            lines.append("- " + " | ".join(parts))
+        else:
+            lines.append("  " + " | ".join(parts))
+
+    lines.append("")
+    return "\n".join(lines)
+
+
 def story_for_trace(
     events: List[TraceEvent], *, markdown: bool = False, include_timeline: bool = False
 ) -> str:
@@ -580,172 +833,14 @@ def story_for_trace(
     """
     if not events:
         return ""
-
-    # Prefer a "packet-like" event for story metadata (flow/ingress),
-    # since traces can include many non-packet lines (rule/verdict/policy).
-    primary = next((e for e in events if e.pkt.ip_saddr and e.pkt.ip_daddr), events[0])
-    flow = _flow_tuple(primary.pkt)
-
-    # Detect key transitions for "story" callouts
-    iif0 = primary.pkt.iif
-    oif_first = next((e.pkt.oif for e in events if e.pkt.oif), None)
-    last = events[-1]
-    last_hook = next((e.hook_hint for e in reversed(events) if e.hook_hint), None)
-    ttl_decrement_by_one_line = _ttl_decrement_by_one_line(events)
-    table_chain_path = _collect_table_chain_path(events)
-
-    # Rules hit (nft "rule ..." trace lines)
-    MAX_RULES = 50
-    rule_order, rule_first_line = _collect_rule_hits(events)
-
-    final_disposition = _final_disposition(events)
-
-    nat_hits, rewrite_hits = _collect_nat_hits(events)
-    mss_hits = _collect_mss_hits(events)
-
-    def _story_lines(*, as_markdown: bool) -> List[str]:
-        """
-        Pre-formatted lines for the Story section.
-
-        - Markdown mode returns proper markdown bullets (including nested bullets).
-        - Text mode returns "- " / "  - " bullets; the caller can indent if desired.
-        """
-        top = "- " if as_markdown else "- "
-        sub = "  - " if as_markdown else "  - "
-
-        lines: List[str] = []
-        subject = flow or "Packet"
-        if iif0:
-            lines.append(f'{top}{subject} arrived on interface "{iif0}".')
-        else:
-            lines.append(f"{top}{subject} appeared in nftrace output.")
-
-        if oif_first:
-            lines.append(f'{top}Routing selected egress interface "{oif_first}" (forwarding path).')
-
-        # Most common forwarding signature is TTL decrement by 1.
-        if ttl_decrement_by_one_line is not None:
-            lines.append(
-                f"{top}TTL was decremented by 1 at L{ttl_decrement_by_one_line} (typical for forwarding)."
-            )
-
-        if last_hook:
-            lines.append(f"{top}It was last observed near the {last_hook} hook (L{last.line_no}).")
-        else:
-            lines.append(f"{top}It was last observed at L{last.line_no}.")
-
-        if final_disposition:
-            ln, verdict = final_disposition
-            lines.append(f"{top}Final verdict: {verdict.upper()} (L{ln}).")
-
-        if nat_hits:
-            lines.append(f"{top}NAT detected:")
-            for ln, msg in nat_hits:
-                lines.append(f"{sub}L{ln}: {msg}")
-        if rewrite_hits:
-            if not nat_hits:
-                lines.append(f"{top}NAT detected:")
-            for ln, msg in rewrite_hits:
-                lines.append(f"{sub}L{ln}: {msg}")
-
-        if mss_hits:
-            lines.append(f"{top}MSS rewrite detected:")
-            for ln, set_value in mss_hits:
-                lines.append(f"{sub}L{ln}: maxseg size set {set_value}")
-
-        if table_chain_path:
-            lines.append(f"{top}Tables visited:")
-            for t, c in table_chain_path:
-                if as_markdown:
-                    lines.append(f"{sub}`{t}`.`{c}`")
-                else:
-                    lines.append(f"{sub}{t}.{c}")
-
-        if rule_order:
-            total_unique = len(rule_order)
-            shown = min(total_unique, MAX_RULES)
-            if total_unique > shown:
-                lines.append(
-                    f"{top}Rules hit (showing first {shown} of {total_unique} unique rules):"
-                )
-            else:
-                lines.append(f"{top}Rules hit:")
-
-            for (t, c, rule_text, verdict) in rule_order[:shown]:
-                if as_markdown:
-                    tc_disp = f"`{t}`.`{c}`"
-                else:
-                    tc_disp = f"{t}.{c}"
-                ln = rule_first_line[(t, c, rule_text, verdict)]
-
-                suffix_bits: List[str] = []
-                if verdict:
-                    suffix_bits.append(f"verdict {verdict}")
-                suffix = f" ({', '.join(suffix_bits)})" if suffix_bits else ""
-
-                lines.append(f"{sub}{tc_disp} L{ln}: {rule_text}{suffix}")
-
-            if total_unique > shown:
-                lines.append(f"{sub}… plus {total_unique - shown} more unique rules")
-        return lines
-
-    # Build output
-    out: List[str] = []
-    title = f"Trace {events[0].trace_id}" if events[0].trace_id != "(unparsed)" else "Trace (unparsed)"
-    if markdown:
-        out.append(f"## {title}")
-        out.append("")
-        out.append("### Story")
-        out.extend(_story_lines(as_markdown=True))
-        out.append("")
-        if flow:
-            out.append(f"- **Flow**: {flow}")
-        if iif0:
-            out.append(f'- **Ingress**: received on `"{iif0}"`')
-        if oif_first:
-            out.append(f'- **Egress**: forwarded out `"{oif_first}"`')
-        if include_timeline:
-            out.append("")
-            out.append("### Raw trace")
-            for e in events:
-                out.append(_wrap_bullet(_format_raw_trace_line(e), prefix="- "))
-            out.append("")
-    else:
-        out.append(title)
-        out.append("")
-        out.append("Story:")
-        for line in _story_lines(as_markdown=False):
-            out.append("  " + line)
-        out.append("")
-        if flow:
-            out.append(f"Flow: {flow}")
-        if iif0:
-            out.append(f'Ingress: "{iif0}"')
-        if oif_first:
-            out.append(f'Egress: "{oif_first}"')
-        if include_timeline:
-            out.append("")
-            out.append("Raw trace:")
-            for e in events:
-                out.append(_wrap_bullet(_format_raw_trace_line(e), prefix="  - "))
-            out.append("")
-
-    return "\n".join(out)
+    data = _build_trace_story_dict(events, include_raw_trace=include_timeline)
+    return _render_trace_story_dict(data, markdown=markdown, include_raw_trace=include_timeline)
 
 
 def build_stories(
     all_events: List[TraceEvent], *, markdown: bool = False, include_timeline: bool = False
 ) -> str:
-    grouped: dict[str, List[TraceEvent]] = defaultdict(list)
-    for e in all_events:
-        grouped[e.trace_id].append(e)
-
-    # Stable ordering: trace ids as encountered (defaultdict doesn’t preserve "first seen"),
-    # so we compute an order list.
-    seen: List[str] = []
-    for e in all_events:
-        if e.trace_id not in seen:
-            seen.append(e.trace_id)
+    grouped, seen = _group_events_by_trace_id(all_events)
 
     blocks: List[str] = []
     for tid in seen:
@@ -769,50 +864,8 @@ def summarize_trace_ids(all_events: List[TraceEvent], *, markdown: bool = False)
     """
     One-line-per-trace-id summary so a user can pick an id to drill into.
     """
-    grouped: dict[str, List[TraceEvent]] = defaultdict(list)
-    for e in all_events:
-        grouped[e.trace_id].append(e)
-
-    # Preserve encounter order.
-    seen: List[str] = []
-    for e in all_events:
-        if e.trace_id not in seen:
-            seen.append(e.trace_id)
-
-    lines: List[str] = []
-    if markdown:
-        lines.append("## Trace IDs")
-        lines.append("")
-    else:
-        lines.append("Trace IDs")
-        lines.append("")
-
-    for tid in seen:
-        evs = grouped[tid]
-        primary = _primary_event(evs)
-        flow = _flow_tuple(primary.pkt) or "(no ip flow)"
-        packet_events = sum(1 for e in evs if e.pkt.ip_saddr and e.pkt.ip_daddr)
-        event_count = len(evs)
-        iif = primary.pkt.iif
-        oif = next((e.pkt.oif for e in evs if e.pkt.oif), None)
-        final = _final_disposition(evs)
-
-        parts = [tid, flow, f"packets={packet_events}", f"events={event_count}"]
-        if iif:
-            parts.append(f'iif="{iif}"')
-        if oif:
-            parts.append(f'oif="{oif}"')
-        if final:
-            ln, verdict = final
-            parts.append(f"verdict={verdict.upper()} (L{ln})")
-
-        if markdown:
-            lines.append("- " + " | ".join(parts))
-        else:
-            lines.append("  " + " | ".join(parts))
-
-    lines.append("")
-    return "\n".join(lines)
+    data = _build_list_ids_dict(all_events)
+    return _render_list_ids_dict(data, markdown=markdown)
 
 
 def main(argv: Optional[List[str]] = None) -> int:
@@ -822,7 +875,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     p.add_argument("trace_file", help="Path to a file containing nftrace output.")
     p.add_argument(
         "--format",
-        choices=["text", "markdown"],
+        choices=["text", "markdown", "json"],
         default="text",
         help="Output format (default: text).",
     )
@@ -901,9 +954,7 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     # Optional filter system (applies to all output modes, including --list-ids)
     if crit is not None:
-        grouped: dict[str, List[TraceEvent]] = defaultdict(list)
-        for e in events:
-            grouped[e.trace_id].append(e)
+        grouped, _ = _group_events_by_trace_id(events)
 
         keep_ids = {
             tid for tid, evs in grouped.items() if tid != "(unparsed)" and _trace_matches_filter(evs, crit)
@@ -913,11 +964,26 @@ def main(argv: Optional[List[str]] = None) -> int:
             print("error: no traces matched --filter", file=sys.stderr)
             return 2
 
-    md = args.format == "markdown"
-    if args.list_ids:
-        rendered = summarize_trace_ids(events, markdown=md)
+    if args.format == "json":
+        if args.list_ids:
+            payload = _build_list_ids_dict(events)
+        else:
+            grouped, seen = _group_events_by_trace_id(events)
+
+            payload = {
+                "traces": [
+                    _build_trace_story_dict(grouped[tid], include_raw_trace=bool(args.show_timeline))
+                    for tid in seen
+                ]
+            }
+
+        rendered = json.dumps(payload, indent=2, ensure_ascii=False) + "\n"
     else:
-        rendered = build_stories(events, markdown=md, include_timeline=args.show_timeline)
+        md = args.format == "markdown"
+        if args.list_ids:
+            rendered = summarize_trace_ids(events, markdown=md)
+        else:
+            rendered = build_stories(events, markdown=md, include_timeline=args.show_timeline)
     if args.out == "-":
         sys.stdout.write(rendered)
         return 0
