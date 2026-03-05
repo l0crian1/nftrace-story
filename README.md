@@ -87,7 +87,7 @@ Example output:
 - Routing selected egress interface "eth0" (forwarding path).
 - TTL was decremented by 1 at L253 (typical for forwarding).
 - It was last observed near the FORWARD hook (L523).
-- Final disposition: ACCEPT (L523).
+- Final verdict: ACCEPT (L523).
 - NAT detected:
   - L271: Masquerade
 - MSS rewrite detected:

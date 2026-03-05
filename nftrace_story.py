@@ -220,7 +220,7 @@ def _primary_event(events: Sequence[TraceEvent]) -> TraceEvent:
 
 def _final_disposition(events: Sequence[TraceEvent]) -> Optional[Tuple[int, str]]:
     """
-    Returns (line_no, verdict) for the last accept/drop/reject observed in the trace.
+    Returns (line_no, verdict) for the last accept/drop/reject (final verdict) observed in the trace.
     """
     final: Optional[Tuple[int, str]] = None
     for e in events:
@@ -304,7 +304,7 @@ def _parse_filter_arg(filter_arg: str) -> dict[str, List[str]]:
 def _trace_matches_filter(events: Sequence[TraceEvent], crit: dict[str, List[str]]) -> bool:
     """
     A trace matches if:
-    - verdict filter matches final disposition (if specified)
+    - verdict filter matches final verdict (if specified)
     - and there exists at least one packet event that matches all address/port criteria (if any specified)
     """
     if not crit:
@@ -636,7 +636,7 @@ def story_for_trace(
 
         if final_disposition:
             ln, verdict = final_disposition
-            lines.append(f"{top}Final disposition: {verdict.upper()} (L{ln}).")
+            lines.append(f"{top}Final verdict: {verdict.upper()} (L{ln}).")
 
         if nat_hits:
             lines.append(f"{top}NAT detected:")
@@ -795,12 +795,16 @@ def summarize_trace_ids(all_events: List[TraceEvent], *, markdown: bool = False)
         event_count = len(evs)
         iif = primary.pkt.iif
         oif = next((e.pkt.oif for e in evs if e.pkt.oif), None)
+        final = _final_disposition(evs)
 
         parts = [tid, flow, f"packets={packet_events}", f"events={event_count}"]
         if iif:
             parts.append(f'iif="{iif}"')
         if oif:
             parts.append(f'oif="{oif}"')
+        if final:
+            ln, verdict = final
+            parts.append(f"verdict={verdict.upper()} (L{ln})")
 
         if markdown:
             lines.append("- " + " | ".join(parts))
