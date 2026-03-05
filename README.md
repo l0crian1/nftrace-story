@@ -93,15 +93,28 @@ Example output:
 - MSS rewrite detected:
   - L259: maxseg size set rt mtu
 - Tables visited:
-  - `trace`: prerouting
-  - `vyos_conntrack`: PREROUTING, VYOS_CT_IGNORE, FW_CONNTRACK, NAT_CONNTRACK, PREROUTING_HELPER, VYOS_CT_HELPER
-  - `vyos_filter`: VYOS_PREROUTING_raw, VYOS_FORWARD_filter
-  - `vrf_zones`: vrf_zones_ct_in
-  - `raw`: VYOS_PREROUTING_HOOK, vyos_rpfilter, vyos_global_rpfilter, VYOS_TCP_MSS
-  - `vyos_static_nat`: PREROUTING, POSTROUTING
-  - `vyos_nat`: PREROUTING, VYOS_PRE_DNAT_HOOK, POSTROUTING, VYOS_PRE_SNAT_HOOK
-  - `mangle`: FORWARD
-  - `nat`: VYOS_PRE_SNAT_HOOK
+  - `trace`.`prerouting`
+  - `vyos_conntrack`.`PREROUTING`
+  - `vyos_conntrack`.`VYOS_CT_IGNORE`
+  - `vyos_conntrack`.`FW_CONNTRACK`
+  - `vyos_conntrack`.`NAT_CONNTRACK`
+  - `vyos_filter`.`VYOS_PREROUTING_raw`
+  - `vrf_zones`.`vrf_zones_ct_in`
+  - `raw`.`VYOS_PREROUTING_HOOK`
+  - `raw`.`vyos_rpfilter`
+  - `raw`.`vyos_global_rpfilter`
+  - `vyos_conntrack`.`PREROUTING_HELPER`
+  - `vyos_conntrack`.`VYOS_CT_HELPER`
+  - `vyos_filter`.`VYOS_FORWARD_filter`
+  - `raw`.`VYOS_TCP_MSS`
+  - `vyos_nat`.`PREROUTING`
+  - `vyos_nat`.`VYOS_PRE_DNAT_HOOK`
+  - `vyos_static_nat`.`PREROUTING`
+  - `mangle`.`FORWARD`
+  - `vyos_static_nat`.`POSTROUTING`
+  - `vyos_nat`.`POSTROUTING`
+  - `nat`.`VYOS_PRE_SNAT_HOOK`
+  - `vyos_nat`.`VYOS_PRE_SNAT_HOOK`
 - Rules hit:
   - `trace`.`prerouting` L217: meta nftrace set 1 (verdict continue)
   - `vyos_conntrack`.`PREROUTING` L221: counter packets 2178 bytes 287508 jump VYOS_CT_IGNORE (verdict jump VYOS_CT_IGNORE)

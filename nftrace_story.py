@@ -551,28 +551,25 @@ def _ttl_decrement_by_one_line(events: Sequence[TraceEvent]) -> Optional[int]:
     return None
 
 
-def _collect_tables_and_chains(
-    events: Sequence[TraceEvent],
-) -> Tuple[List[str], dict[str, List[str]]]:
+def _collect_table_chain_path(events: Sequence[TraceEvent]) -> List[Tuple[str, str]]:
     """
-    Returns (table_order, table_chains) preserving encounter order and de-duping chains.
+    Return a de-duped list of (table, chain) pairs in encounter order.
     """
-    table_order: List[str] = []
-    table_chains: dict[str, List[str]] = {}
+    path: List[Tuple[str, str]] = []
+    seen: set[Tuple[str, str]] = set()
 
     for e in events:
         t = e.table
-        if t == "?":
-            continue
-        if t not in table_chains:
-            table_chains[t] = []
-            table_order.append(t)
-
         c = e.chain
-        if c != "?" and c not in table_chains[t]:
-            table_chains[t].append(c)
+        if t == "?" or c == "?":
+            continue
+        key = (t, c)
+        if key in seen:
+            continue
+        seen.add(key)
+        path.append(key)
 
-    return table_order, table_chains
+    return path
 
 
 def story_for_trace(
@@ -595,7 +592,7 @@ def story_for_trace(
     last = events[-1]
     last_hook = next((e.hook_hint for e in reversed(events) if e.hook_hint), None)
     ttl_decrement_by_one_line = _ttl_decrement_by_one_line(events)
-    table_order, table_chains = _collect_tables_and_chains(events)
+    table_chain_path = _collect_table_chain_path(events)
 
     # Rules hit (nft "rule ..." trace lines)
     MAX_RULES = 50
@@ -656,18 +653,13 @@ def story_for_trace(
             for ln, set_value in mss_hits:
                 lines.append(f"{sub}L{ln}: maxseg size set {set_value}")
 
-        if table_order:
+        if table_chain_path:
             lines.append(f"{top}Tables visited:")
-            for t in table_order:
-                chains = table_chains.get(t) or []
+            for t, c in table_chain_path:
                 if as_markdown:
-                    t_disp = f"`{t}`"
+                    lines.append(f"{sub}`{t}`.`{c}`")
                 else:
-                    t_disp = t
-                if chains:
-                    lines.append(f"{sub}{t_disp}: " + ", ".join(chains))
-                else:
-                    lines.append(f"{sub}{t_disp}")
+                    lines.append(f"{sub}{t}.{c}")
 
         if rule_order:
             total_unique = len(rule_order)
