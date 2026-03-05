@@ -209,16 +209,6 @@ def _flow_tuple(pkt: PacketView) -> Optional[str]:
     return f"{pkt.ip_saddr} → {pkt.ip_daddr}"
 
 
-def _primary_event(events: Sequence[TraceEvent]) -> TraceEvent:
-    """
-    Best-effort choice for "the packet" for a given trace id.
-    Prefer a packet-like event with ip saddr/daddr so we can build a flow string.
-    """
-    if not events:
-        raise ValueError("events must be non-empty")
-    return next((e for e in events if e.pkt.ip_saddr and e.pkt.ip_daddr), events[0])
-
-
 def _final_verdict(events: Sequence[TraceEvent]) -> Optional[Tuple[int, str]]:
     """
     Returns (line_no, verdict) for the last accept/drop/reject (final verdict) observed in the trace.
@@ -386,39 +376,6 @@ def _wrap_bullet(content: str, *, prefix: str, width: int = RAW_TRACE_WRAP_WIDTH
     )
 
 
-def _collect_rule_hits(
-    events: Sequence[TraceEvent],
-) -> Tuple[List[Tuple[str, str, str, str]], dict[Tuple[str, str, str, str], int]]:
-    """
-    Collect unique nft \"rule ...\" hits in encounter order.
-
-    Returns:
-      - rule_order: list of (table, chain, rule_text, verdict)
-      - rule_first_line: mapping from that tuple to the first line number seen
-    """
-    rule_order: List[Tuple[str, str, str, str]] = []
-    rule_first_line: dict[Tuple[str, str, str, str], int] = {}
-
-    for e in events:
-        payload = (e.payload or "").strip()
-        if not payload.lower().startswith("rule "):
-            continue
-
-        verdict_m = VERDICT_PAREN_RE.search(payload)
-        verdict = verdict_m.group(1).strip() if verdict_m else ""
-
-        # Compact display: drop the leading "rule " and strip trailing "(verdict ...)".
-        rule_text = payload[5:].strip()
-        rule_text = VERDICT_SUFFIX_RE.sub("", rule_text).strip()
-
-        key = (e.table, e.chain, rule_text, verdict)
-        if key not in rule_first_line:
-            rule_order.append(key)
-            rule_first_line[key] = e.line_no
-
-    return rule_order, rule_first_line
-
-
 def _pkt_sig(p: PacketView) -> Optional[Tuple[str, str, str, Optional[int], Optional[int]]]:
     if not p.ip_saddr or not p.ip_daddr:
         return None
@@ -428,134 +385,6 @@ def _pkt_sig(p: PacketView) -> Optional[Tuple[str, str, str, Optional[int], Opti
     if proto == "udp":
         return (p.ip_saddr, p.ip_daddr, proto, p.udp_sport, p.udp_dport)
     return (p.ip_saddr, p.ip_daddr, proto, None, None)
-
-
-def _collect_nat_hits(events: Sequence[TraceEvent]) -> Tuple[List[Tuple[int, str]], List[Tuple[int, str]]]:
-    """
-    NAT detection heuristics:
-      - keyword hits: dnat to / snat to / masquerade (capped)
-      - first saddr/daddr rewrite detected within this trace id (0 or 1 entries)
-    """
-    NAT_MAX_HITS = 10
-    nat_hits: List[Tuple[int, str]] = []
-
-    for e in events:
-        payload = (e.payload or "").strip()
-        if not payload:
-            continue
-
-        m = DNAT_RE.search(payload)
-        if m:
-            target = VERDICT_SUFFIX_RE.sub("", m.group(1).strip()).strip()
-            nat_hits.append((e.line_no, f"DNAT to {target}"))
-        m = SNAT_RE.search(payload)
-        if m:
-            target = VERDICT_SUFFIX_RE.sub("", m.group(1).strip()).strip()
-            nat_hits.append((e.line_no, f"SNAT to {target}"))
-        if MASQUERADE_RE.search(payload):
-            nat_hits.append((e.line_no, "Masquerade"))
-
-        if len(nat_hits) >= NAT_MAX_HITS:
-            break
-
-    # Rewrite signal: first change in saddr/daddr (with extra detail if ports change too)
-    rewrite_hits: List[Tuple[int, str]] = []
-    prev_sig: Optional[Tuple[str, str, str, Optional[int], Optional[int]]] = None
-    prev_flow: Optional[str] = None
-
-    for e in events:
-        sig = _pkt_sig(e.pkt)
-        if sig is None:
-            continue
-
-        flow = _flow_tuple(e.pkt) or f"{sig[0]} → {sig[1]}"
-        if prev_sig is not None and sig != prev_sig:
-            saddr0, daddr0, proto0, sport0, dport0 = prev_sig
-            saddr1, daddr1, proto1, sport1, dport1 = sig
-
-            addr_changed = (saddr0 != saddr1) or (daddr0 != daddr1)
-            if addr_changed:
-                before = prev_flow or f"{proto0} {saddr0} → {daddr0}"
-                after = flow
-
-                changes: List[str] = []
-                if saddr0 != saddr1:
-                    changes.append(f"saddr {saddr0} → {saddr1}")
-                if daddr0 != daddr1:
-                    changes.append(f"daddr {daddr0} → {daddr1}")
-                if sport0 != sport1 and (sport0 is not None or sport1 is not None):
-                    changes.append(f"sport {sport0} → {sport1}")
-                if dport0 != dport1 and (dport0 is not None or dport1 is not None):
-                    changes.append(f"dport {dport0} → {dport1}")
-
-                detail = "; ".join(changes) if changes else "flow changed"
-                rewrite_hits.append(
-                    (e.line_no, f"Flow rewrite: {before} became {after} ({detail})")
-                )
-                break
-
-        prev_sig = sig
-        prev_flow = flow
-
-    return nat_hits, rewrite_hits
-
-
-def _collect_mss_hits(events: Sequence[TraceEvent]) -> List[Tuple[int, str]]:
-    """
-    Detect likely MSS rewrites (tcp option maxseg size set ...), capped.
-    """
-    MSS_MAX_HITS = 10
-    mss_hits: List[Tuple[int, str]] = []
-
-    for e in events:
-        payload = (e.payload or "").strip()
-        if not payload:
-            continue
-        m = MSS_SET_RE.search(payload)
-        if not m:
-            continue
-        set_value = VERDICT_SUFFIX_RE.sub("", m.group(1).strip()).strip()
-        mss_hits.append((e.line_no, set_value))
-        if len(mss_hits) >= MSS_MAX_HITS:
-            break
-
-    return mss_hits
-
-
-def _ttl_decrement_by_one_line(events: Sequence[TraceEvent]) -> Optional[int]:
-    """
-    Return the line number of the first observed TTL decrement by 1, if any.
-    """
-    prev_ttl: Optional[int] = None
-    for e in events:
-        ttl = e.pkt.ip_ttl
-        if ttl is None:
-            continue
-        if prev_ttl is not None and (prev_ttl - ttl) == 1:
-            return e.line_no
-        prev_ttl = ttl
-    return None
-
-
-def _collect_table_chain_path(events: Sequence[TraceEvent]) -> List[Tuple[str, str]]:
-    """
-    Return a de-duped list of (table, chain) pairs in encounter order.
-    """
-    path: List[Tuple[str, str]] = []
-    seen: set[Tuple[str, str]] = set()
-
-    for e in events:
-        t = e.table
-        c = e.chain
-        if t == "?" or c == "?":
-            continue
-        key = (t, c)
-        if key in seen:
-            continue
-        seen.add(key)
-        path.append(key)
-
-    return path
 
 
 def _build_trace_story_dict(events: Sequence[TraceEvent], *, include_raw_trace: bool) -> dict:
