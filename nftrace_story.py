@@ -566,34 +566,136 @@ def _build_trace_story_dict(events: Sequence[TraceEvent], *, include_raw_trace: 
     if not events:
         raise ValueError("events must be non-empty")
 
-    primary = next((e for e in events if e.pkt.ip_saddr and e.pkt.ip_daddr), events[0])
-    flow = _flow_tuple(primary.pkt)
-
-    iif0 = primary.pkt.iif
-    oif_first = next((e.pkt.oif for e in events if e.pkt.oif), None)
+    # Single-pass analysis over this trace's events.
+    primary: Optional[TraceEvent] = None
+    oif_first: Optional[str] = None
     last = events[-1]
-    last_hook = next((e.hook_hint for e in reversed(events) if e.hook_hint), None)
+    last_hook: Optional[str] = None
 
-    ttl_dec_line = _ttl_decrement_by_one_line(events)
-    table_chain_path = _collect_table_chain_path(events)
+    ttl_dec_line: Optional[int] = None
+    prev_ttl: Optional[int] = None
+
+    table_chain_path: List[Tuple[str, str]] = []
+    table_chain_seen: set[Tuple[str, str]] = set()
 
     max_rules = 50
-    rule_order, rule_first_line = _collect_rule_hits(events)
-    rules: List[dict] = []
-    for t, c, rule_text, verdict in rule_order:
-        rules.append(
-            {
-                "table": t,
-                "chain": c,
-                "line": rule_first_line[(t, c, rule_text, verdict)],
-                "rule": rule_text,
-                "verdict": verdict or None,
-            }
-        )
+    rule_order: List[Tuple[str, str, str, str]] = []
+    rule_first_line: dict[Tuple[str, str, str, str], int] = {}
 
-    final = _final_verdict(events)
-    nat_hits, rewrite_hits = _collect_nat_hits(events)
-    mss_hits = _collect_mss_hits(events)
+    final: Optional[Tuple[int, str]] = None
+
+    nat_hits: List[Tuple[int, str]] = []
+    rewrite_hits: List[Tuple[int, str]] = []
+    NAT_MAX_HITS = 10
+    rewrite_found = False
+    prev_sig: Optional[Tuple[str, str, str, Optional[int], Optional[int]]] = None
+    prev_flow: Optional[str] = None
+
+    mss_hits: List[Tuple[int, str]] = []
+    MSS_MAX_HITS = 10
+
+    raw_trace: Optional[List[dict]] = [] if include_raw_trace else None
+
+    for e in events:
+        payload = (e.payload or "").strip()
+
+        if raw_trace is not None:
+            raw_trace.append({"line": e.line_no, "text": _format_raw_trace_line(e)})
+
+        if primary is None and e.pkt.ip_saddr and e.pkt.ip_daddr:
+            primary = e
+
+        if oif_first is None and e.pkt.oif:
+            oif_first = e.pkt.oif
+
+        if e.hook_hint:
+            last_hook = e.hook_hint
+
+        ttl = e.pkt.ip_ttl
+        if ttl is not None:
+            if ttl_dec_line is None and prev_ttl is not None and (prev_ttl - ttl) == 1:
+                ttl_dec_line = e.line_no
+            prev_ttl = ttl
+
+        t = e.table
+        c = e.chain
+        if t != "?" and c != "?":
+            key_tc = (t, c)
+            if key_tc not in table_chain_seen:
+                table_chain_seen.add(key_tc)
+                table_chain_path.append(key_tc)
+
+        if payload.lower().startswith("rule "):
+            verdict_m = VERDICT_PAREN_RE.search(payload)
+            verdict = verdict_m.group(1).strip() if verdict_m else ""
+
+            rule_text = payload[5:].strip()
+            rule_text = VERDICT_SUFFIX_RE.sub("", rule_text).strip()
+
+            key_rule = (e.table, e.chain, rule_text, verdict)
+            if key_rule not in rule_first_line:
+                rule_order.append(key_rule)
+                rule_first_line[key_rule] = e.line_no
+
+        m = DISPOSITION_RE.search(payload)
+        if m:
+            v = (m.group("v1") or m.group("v2") or m.group("v3") or "").lower()
+            if v:
+                final = (e.line_no, v)
+
+        if len(nat_hits) < NAT_MAX_HITS and payload:
+            m = DNAT_RE.search(payload)
+            if m:
+                target = VERDICT_SUFFIX_RE.sub("", m.group(1).strip()).strip()
+                nat_hits.append((e.line_no, f"DNAT to {target}"))
+            m = SNAT_RE.search(payload)
+            if m:
+                target = VERDICT_SUFFIX_RE.sub("", m.group(1).strip()).strip()
+                nat_hits.append((e.line_no, f"SNAT to {target}"))
+            if MASQUERADE_RE.search(payload):
+                nat_hits.append((e.line_no, "Masquerade"))
+
+        if len(mss_hits) < MSS_MAX_HITS and payload:
+            m = MSS_SET_RE.search(payload)
+            if m:
+                set_value = VERDICT_SUFFIX_RE.sub("", m.group(1).strip()).strip()
+                mss_hits.append((e.line_no, set_value))
+
+        if not rewrite_found:
+            sig = _pkt_sig(e.pkt)
+            if sig is not None:
+                flow_now = _flow_tuple(e.pkt) or f"{sig[0]} → {sig[1]}"
+                if prev_sig is not None and sig != prev_sig:
+                    saddr0, daddr0, proto0, sport0, dport0 = prev_sig
+                    saddr1, daddr1, proto1, sport1, dport1 = sig
+
+                    addr_changed = (saddr0 != saddr1) or (daddr0 != daddr1)
+                    if addr_changed:
+                        before = prev_flow or f"{proto0} {saddr0} → {daddr0}"
+                        after = flow_now
+
+                        changes: List[str] = []
+                        if saddr0 != saddr1:
+                            changes.append(f"saddr {saddr0} → {saddr1}")
+                        if daddr0 != daddr1:
+                            changes.append(f"daddr {daddr0} → {daddr1}")
+                        if sport0 != sport1 and (sport0 is not None or sport1 is not None):
+                            changes.append(f"sport {sport0} → {sport1}")
+                        if dport0 != dport1 and (dport0 is not None or dport1 is not None):
+                            changes.append(f"dport {dport0} → {dport1}")
+
+                        detail = "; ".join(changes) if changes else "flow changed"
+                        rewrite_hits.append(
+                            (e.line_no, f"Flow rewrite: {before} became {after} ({detail})")
+                        )
+                        rewrite_found = True
+
+                prev_sig = sig
+                prev_flow = flow_now
+
+    primary = primary or events[0]
+    flow = _flow_tuple(primary.pkt)
+    iif0 = primary.pkt.iif
 
     data: dict = {
         "id": events[0].trace_id,
@@ -609,12 +711,21 @@ def _build_trace_story_dict(events: Sequence[TraceEvent], *, include_raw_trace: 
         },
         "mss_rewrite": [{"line": ln, "value": val} for ln, val in mss_hits],
         "tables_visited": [{"table": t, "chain": c} for t, c in table_chain_path],
-        "rules_hit": rules,
+        "rules_hit": [
+            {
+                "table": t,
+                "chain": c,
+                "line": rule_first_line[(t, c, rule_text, verdict)],
+                "rule": rule_text,
+                "verdict": verdict or None,
+            }
+            for (t, c, rule_text, verdict) in rule_order
+        ],
         "rules_cap": max_rules,
     }
 
     if include_raw_trace:
-        data["raw_trace"] = [{"line": e.line_no, "text": _format_raw_trace_line(e)} for e in events]
+        data["raw_trace"] = raw_trace or []
 
     return data
 
@@ -774,13 +885,33 @@ def _build_list_ids_dict(all_events: Sequence[TraceEvent]) -> dict:
     rows: List[dict] = []
     for tid in seen:
         evs = grouped[tid]
-        primary = _primary_event(evs)
+        if not evs:
+            continue
+
+        primary: Optional[TraceEvent] = None
+        packet_events = 0
+        oif: Optional[str] = None
+        final: Optional[Tuple[int, str]] = None
+
+        for e in evs:
+            if e.pkt.ip_saddr and e.pkt.ip_daddr:
+                packet_events += 1
+                if primary is None:
+                    primary = e
+
+            if oif is None and e.pkt.oif:
+                oif = e.pkt.oif
+
+            m = DISPOSITION_RE.search(e.payload)
+            if m:
+                v = (m.group("v1") or m.group("v2") or m.group("v3") or "").lower()
+                if v:
+                    final = (e.line_no, v)
+
+        primary = primary or evs[0]
         flow = _flow_tuple(primary.pkt) or "(no ip flow)"
-        packet_events = sum(1 for e in evs if e.pkt.ip_saddr and e.pkt.ip_daddr)
         event_count = len(evs)
         iif = primary.pkt.iif
-        oif = next((e.pkt.oif for e in evs if e.pkt.oif), None)
-        final = _final_verdict(evs)
 
         rows.append(
             {
@@ -868,7 +999,7 @@ def summarize_trace_ids(all_events: List[TraceEvent], *, markdown: bool = False)
     return _render_list_ids_dict(data, markdown=markdown)
 
 
-def main(argv: Optional[List[str]] = None) -> int:
+def _parse_args(argv: Optional[List[str]]) -> argparse.Namespace:
     p = argparse.ArgumentParser(
         description="Turn nftrace output (nft monitor trace) into a human readable story."
     )
@@ -910,66 +1041,81 @@ def main(argv: Optional[List[str]] = None) -> int:
         dest="trace_filter",
         help='Filter traces, e.g. --filter "srcaddr=1.2.3.4,dstport=443,verdict=accept"',
     )
-    args = p.parse_args(argv)
+    return p.parse_args(argv)
 
+
+def _validate_args(args: argparse.Namespace) -> Optional[dict[str, List[str]]]:
     if args.trace_id and args.trace_filter:
         print(
             "error: --id and --filter cannot be used together (choose one).",
             file=sys.stderr,
         )
-        return 2
+        raise SystemExit(2)
 
-    # Validate filter early (before reading/parsing the input file).
-    crit: Optional[dict[str, List[str]]] = None
-    if args.trace_filter:
-        try:
-            crit = _parse_filter_arg(args.trace_filter)
-        except ValueError as e:
-            print(f"error: invalid --filter: {e}", file=sys.stderr)
-            return 2
+    if not args.trace_filter:
+        return None
 
+    try:
+        return _parse_filter_arg(args.trace_filter)
+    except ValueError as e:
+        print(f"error: invalid --filter: {e}", file=sys.stderr)
+        raise SystemExit(2)
+
+
+def _load_events(args: argparse.Namespace) -> List[TraceEvent]:
     try:
         with open(args.trace_file, "r", encoding="utf-8", errors="replace") as f:
             events = parse_trace_lines(f, include_nontrace_lines=args.include_nontrace_lines)
     except OSError as e:
         print(f"error: failed to read {args.trace_file!r}: {e}", file=sys.stderr)
-        return 2
+        raise SystemExit(2)
 
-    # If we didn't see any "trace id ..." lines, avoid failing silently.
     if not any(e.trace_id != "(unparsed)" for e in events):
         print(
             "error: no trace events found (no 'trace id ...' lines detected). "
             "Is this the right file?",
             file=sys.stderr,
         )
-        return 2
+        raise SystemExit(2)
 
-    # Optional trace id filter
-    if args.trace_id:
-        want = args.trace_id.lower()
-        events = [e for e in events if e.trace_id.lower() == want]
-        if not events:
-            print(f"error: trace id {args.trace_id!r} not found in input", file=sys.stderr)
-            return 2
+    return events
 
-    # Optional filter system (applies to all output modes, including --list-ids)
-    if crit is not None:
-        grouped, _ = _group_events_by_trace_id(events)
 
-        keep_ids = {
-            tid for tid, evs in grouped.items() if tid != "(unparsed)" and _trace_matches_filter(evs, crit)
-        }
-        events = [e for e in events if e.trace_id in keep_ids]
-        if not any(e.trace_id != "(unparsed)" for e in events):
-            print("error: no traces matched --filter", file=sys.stderr)
-            return 2
+def _apply_id_filter(events: List[TraceEvent], args: argparse.Namespace) -> List[TraceEvent]:
+    if not args.trace_id:
+        return events
 
+    want = args.trace_id.lower()
+    filtered = [e for e in events if e.trace_id.lower() == want]
+    if not filtered:
+        print(f"error: trace id {args.trace_id!r} not found in input", file=sys.stderr)
+        raise SystemExit(2)
+    return filtered
+
+
+def _apply_trace_filter(
+    events: List[TraceEvent], crit: Optional[dict[str, List[str]]]
+) -> List[TraceEvent]:
+    if crit is None:
+        return events
+
+    grouped, _ = _group_events_by_trace_id(events)
+    keep_ids = {
+        tid for tid, evs in grouped.items() if tid != "(unparsed)" and _trace_matches_filter(evs, crit)
+    }
+    filtered = [e for e in events if e.trace_id in keep_ids]
+    if not any(e.trace_id != "(unparsed)" for e in filtered):
+        print("error: no traces matched --filter", file=sys.stderr)
+        raise SystemExit(2)
+    return filtered
+
+
+def _render_output(events: List[TraceEvent], args: argparse.Namespace) -> str:
     if args.format == "json":
         if args.list_ids:
             payload = _build_list_ids_dict(events)
         else:
             grouped, seen = _group_events_by_trace_id(events)
-
             payload = {
                 "traces": [
                     _build_trace_story_dict(grouped[tid], include_raw_trace=bool(args.show_timeline))
@@ -977,13 +1123,15 @@ def main(argv: Optional[List[str]] = None) -> int:
                 ]
             }
 
-        rendered = json.dumps(payload, indent=2, ensure_ascii=False) + "\n"
-    else:
-        md = args.format == "markdown"
-        if args.list_ids:
-            rendered = summarize_trace_ids(events, markdown=md)
-        else:
-            rendered = build_stories(events, markdown=md, include_timeline=args.show_timeline)
+        return json.dumps(payload, indent=2, ensure_ascii=False) + "\n"
+
+    md = args.format == "markdown"
+    if args.list_ids:
+        return summarize_trace_ids(events, markdown=md)
+    return build_stories(events, markdown=md, include_timeline=args.show_timeline)
+
+
+def _write_output(rendered: str, args: argparse.Namespace) -> int:
     if args.out == "-":
         sys.stdout.write(rendered)
         return 0
@@ -996,6 +1144,20 @@ def main(argv: Optional[List[str]] = None) -> int:
         return 2
 
     return 0
+
+
+def main(argv: Optional[List[str]] = None) -> int:
+    try:
+        args = _parse_args(argv)
+        crit = _validate_args(args)
+        events = _load_events(args)
+        events = _apply_id_filter(events, args)
+        events = _apply_trace_filter(events, crit)
+        rendered = _render_output(events, args)
+        return _write_output(rendered, args)
+    except SystemExit as e:
+        # Helpers raise SystemExit(2) on user-facing errors; keep main() signature (int return).
+        return int(e.code) if isinstance(e.code, int) else 2
 
 
 if __name__ == "__main__":
